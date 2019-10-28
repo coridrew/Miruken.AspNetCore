@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.757
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Miruken.AspNetCore", "Source\Miruken.AspNetCore\Miruken.AspNetCore.csproj", "{DAFF1857-5594-4532-B246-44FF894D839D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{3B77294B-2ED8-4441-B854-E4078A54CEBE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Miruken.AspNetCore.Tests", "Test\Miruken.AspNetCore.Tests\Miruken.AspNetCore.Tests.csproj", "{053884DC-7457-4FE3-9B6B-C256F5C99579}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DAFF1857-5594-4532-B246-44FF894D839D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DAFF1857-5594-4532-B246-44FF894D839D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DAFF1857-5594-4532-B246-44FF894D839D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DAFF1857-5594-4532-B246-44FF894D839D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{053884DC-7457-4FE3-9B6B-C256F5C99579}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{053884DC-7457-4FE3-9B6B-C256F5C99579}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{053884DC-7457-4FE3-9B6B-C256F5C99579}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{053884DC-7457-4FE3-9B6B-C256F5C99579}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{053884DC-7457-4FE3-9B6B-C256F5C99579} = {3B77294B-2ED8-4441-B854-E4078A54CEBE}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D107F050-EF1F-4F18-A73B-514B2760FB99}
+	EndGlobalSection
+EndGlobal
