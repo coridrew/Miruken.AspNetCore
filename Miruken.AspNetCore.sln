@@ -9,6 +9,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{3B77294B-2
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Miruken.AspNetCore.Tests", "Test\Miruken.AspNetCore.Tests\Miruken.AspNetCore.Tests.csproj", "{053884DC-7457-4FE3-9B6B-C256F5C99579}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miruken.AspNetCore.Test.Site", "Test\Miruken.AspNetCore.Test.Site\Miruken.AspNetCore.Test.Site.csproj", "{FD4695DF-82C9-4F34-941C-DEB65C8D486B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,12 +25,17 @@ Global
 		{053884DC-7457-4FE3-9B6B-C256F5C99579}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{053884DC-7457-4FE3-9B6B-C256F5C99579}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{053884DC-7457-4FE3-9B6B-C256F5C99579}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD4695DF-82C9-4F34-941C-DEB65C8D486B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD4695DF-82C9-4F34-941C-DEB65C8D486B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD4695DF-82C9-4F34-941C-DEB65C8D486B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD4695DF-82C9-4F34-941C-DEB65C8D486B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{053884DC-7457-4FE3-9B6B-C256F5C99579} = {3B77294B-2ED8-4441-B854-E4078A54CEBE}
+		{FD4695DF-82C9-4F34-941C-DEB65C8D486B} = {3B77294B-2ED8-4441-B854-E4078A54CEBE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D107F050-EF1F-4F18-A73B-514B2760FB99}
