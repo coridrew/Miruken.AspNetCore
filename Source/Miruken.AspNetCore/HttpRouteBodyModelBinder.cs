@@ -14,19 +14,19 @@
     using Microsoft.Extensions.ObjectPool;
     using Microsoft.Extensions.Options;
 
-    public class HttpRouteModelBinder : IModelBinder
+    public class HttpRouteBodyModelBinder : IModelBinder
     {
         private readonly JsonInputFormatter _input;
         private readonly Func<Stream, Encoding, TextReader> _readerFactory;
 
-        public HttpRouteModelBinder(
+        public HttpRouteBodyModelBinder(
             IHttpRequestStreamReaderFactory readerFactory,
             ILoggerFactory loggerFactory,
             IOptions<MvcOptions> options, IOptions<MvcJsonOptions> jsonOptions,
             ArrayPool<char> charPool, ObjectPoolProvider objectPoolProvider)
         {
             _input = new JsonInputFormatter(
-                loggerFactory.CreateLogger(typeof(HttpRouteModelBinder)),
+                loggerFactory.CreateLogger(typeof(HttpRouteBodyModelBinder)),
                 HttpFormatters.Route.SerializerSettings, charPool,
                 objectPoolProvider, options.Value, jsonOptions.Value);
 

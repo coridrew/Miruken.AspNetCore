@@ -5,12 +5,13 @@
     <LangVersion>latest</LangVersion>
     <Authors>cneuwirt</Authors>
     <Company>Miruken</Company>
-    <Description>Asp.Net Core Integration with Miruken</Description>
+    <Description>Asp.Net Core Swagger Integration with Miruken</Description>
     <Copyright>Copyright 2019</Copyright>
     <PackageLicenseUrl>https://github.com/Miruken-DotNet/Miruken.AspNet/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/Miruken-DotNet/Miruken.AspNet</PackageProjectUrl>
     <PackageIconUrl>https://avatars0.githubusercontent.com/u/20844317</PackageIconUrl>
-    <PackageTags>Miruken Asp.Net Core</PackageTags>
+    <RepositoryType></RepositoryType>
+    <PackageTags>Miruken Asp.Net Swagger OpenApi Core</PackageTags>
     <PackageReleaseNotes>Summary of changes made in this release of the package.</PackageReleaseNotes>
   </PropertyGroup>
 
@@ -19,10 +20,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
-    <PackageReference Include="Miruken" Version="3.9.99-Alpha.95" />
+    <PackageReference Include="AutoFixture" Version="4.11.0" />
     <PackageReference Include="Miruken.Http" Version="3.9.99-Alpha.95" />
-    <PackageReference Include="Miruken.Validate" Version="3.9.99-Alpha.95" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Miruken.AspNetCore\Miruken.AspNetCore.csproj" />
   </ItemGroup>
 
 </Project>

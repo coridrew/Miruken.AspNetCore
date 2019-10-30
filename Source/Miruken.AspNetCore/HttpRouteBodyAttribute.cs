@@ -6,7 +6,7 @@ namespace Miruken.AspNetCore
 
     public sealed class HttpRouteBodyAttribute : ModelBinderAttribute
     {
-        public HttpRouteBodyAttribute() : base(typeof(HttpRouteModelBinder))
+        public HttpRouteBodyAttribute() : base(typeof(HttpRouteBodyModelBinder))
         {
             BindingSource = BindingSource.Body;
         }
