@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
-
-namespace Miruken.AspNetCore.Test.Site
+﻿namespace Miruken.AspNetCore.Test.Site
 {
+    using System.IO;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.Extensions.Logging;
+
     public class Program
     {
         public static void Main(string[] args)
@@ -11,7 +12,15 @@ namespace Miruken.AspNetCore.Test.Site
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
+            new WebHostBuilder()
+                .ConfigureLogging(logging =>
+                {
+                    logging.ClearProviders();
+                    logging.AddConsole();
+                    logging.AddDebug();
+                })
+                .UseIIS()
+                .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseStartup<Startup>();
     }
 }

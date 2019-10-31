@@ -15,9 +15,9 @@
      Route("[controller]")]
     public class PlayerController : ContextualControllerBase
     {
-        private readonly ILogger<PlayerController> _logger;
+        private readonly ILogger _logger;
 
-        public PlayerController(ILogger<PlayerController> logger)
+        public PlayerController(ILogger logger)
         {
             _logger = logger;
         }
