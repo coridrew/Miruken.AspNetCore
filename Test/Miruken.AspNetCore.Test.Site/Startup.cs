@@ -5,7 +5,6 @@
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Logging;
     using Register;
     using Swashbuckle.AspNetCore.Swagger;
     using Validate;
@@ -29,7 +28,7 @@
                 c.SwaggerDoc("v1", new Info
                 {
                     Version     = "v1",
-                    Title       = "Miruken",
+                    Title       = "Test Api",
                     Description = "Swagger Integration with Miruken"
                 });
             });
@@ -46,9 +45,7 @@
             app.UseMvc()
                .UseSwagger()
                .UseSwaggerUI(c =>
-               {
-                   c.SwaggerEndpoint("/swagger/v1/swagger.json", "Miruken");
-               })
+                   c.SwaggerEndpoint("/swagger/v1/swagger.json", "Test Api"))
                .UseDeveloperExceptionPage();
         }
     }
