@@ -6,6 +6,7 @@
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Register;
+    using Swagger;
     using Swashbuckle.AspNetCore.Swagger;
     using Validate;
 
@@ -31,10 +32,12 @@
                     Title       = "Test Api",
                     Description = "Swagger Integration with Miruken"
                 });
+                c.CustomSchemaIds(MirukenDocumentFilter.ModelToSchemaId);
+                c.DocumentFilter<MirukenDocumentFilter>();
             });
 
             return services.AddMiruken(configure => configure
-                //.PublicSources(sources => sources.FromAssemblyOf<Startup>())
+                .PublicSources(sources => sources.FromAssemblyOf<Startup>())
                 .WithAspNet(options => options.AddControllers())
                 .WithValidation()
             );
