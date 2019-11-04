@@ -1,15 +1,12 @@
 ﻿namespace Miruken.AspNetCore.Test.Site.Controllers
 {
+    using System.Threading.Tasks;
+    using Api;
     using AspNetCore;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
     using Newtonsoft.Json;
-
-    public class Player 
-    {
-        public int    Id   { get; set; }
-        public string Name { get; set; }
-    }
+    using Tests;
 
     [ApiController,
      Route("[controller]")]
@@ -23,26 +20,29 @@
         }
 
         [HttpGet, Route("{id}")]
-        public Player GetPlayer(int id)
+        public async Task<Player> GetPlayer(int id)
         {
             _logger.LogInformation("Getting player {0}", id);
-            return new Player { Id = id, Name = "Christiano Ronaldo" };
+            return (await Context.Send(new GetPlayer {PlayerId = id})).Player;
         }
 
         [HttpPost, Route("")]
-        public Player CreatePlayer(Player player)
+        public async Task<Player> CreatePlayer(Player player)
         {
             _logger.LogInformation("Creating player");
-            player.Id = 1;
-            _logger.LogInformation("Created player {0}", JsonConvert.SerializeObject(player));
-            _logger.LogInformation("Created player", JsonConvert.SerializeObject(player));
-            _logger.LogInformation("Created player", player);
+            var created = await Context.Send(new CreatePlayer {Player = player});
+            _logger.LogInformation("Created player {Player}",
+                JsonConvert.SerializeObject(created.Player));
             return player;        
         }
 
         [HttpPut, Route("")]
-        public Player UpdatePlayer(Player player)
+        public async Task<Player> UpdatePlayer(Player player)
         {
+            _logger.LogInformation("Updating player");
+            var updated = await Context.Send(new UpdatePlayer { Player = player });
+            _logger.LogInformation("Updated player {Player}",
+                JsonConvert.SerializeObject(updated.Player));
             return player;
         }
 

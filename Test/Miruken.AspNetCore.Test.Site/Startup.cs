@@ -8,6 +8,7 @@
     using Register;
     using Swagger;
     using Swashbuckle.AspNetCore.Swagger;
+    using Tests;
     using Validate;
 
     public class Startup
@@ -21,7 +22,10 @@
 
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc()
+            services.AddMvc(config =>
+                {
+                    config.Filters.Add(typeof(TestApiExceptionFilter));
+                })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddSwaggerGen(c =>
@@ -37,7 +41,7 @@
             });
 
             return services.AddMiruken(configure => configure
-                .PublicSources(sources => sources.FromAssemblyOf<Startup>())
+                .PublicSources(sources => sources.FromAssemblyOf<PlayerHandler>())
                 .WithAspNet(options => options.AddControllers())
                 .WithValidation()
             );
@@ -46,10 +50,9 @@
         public void Configure(IApplicationBuilder app)
         {
             app.UseMvc()
-               .UseSwagger()
-               .UseSwaggerUI(c =>
-                   c.SwaggerEndpoint("/swagger/v1/swagger.json", "Test Api"))
-               .UseDeveloperExceptionPage();
+                .UseSwagger()
+                .UseSwaggerUI(c =>
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Test Api"));
         }
     }
 }

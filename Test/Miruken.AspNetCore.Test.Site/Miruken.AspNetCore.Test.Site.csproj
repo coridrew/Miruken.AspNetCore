@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Source\Miruken.AspNetCore.Swagger\Miruken.AspNetCore.Swagger.csproj" />
     <ProjectReference Include="..\..\Source\Miruken.AspNetCore\Miruken.AspNetCore.csproj" />
+    <ProjectReference Include="..\Miruken.AspNetCore.Tests\Miruken.AspNetCore.Tests.csproj" />
   </ItemGroup>
 
 </Project>

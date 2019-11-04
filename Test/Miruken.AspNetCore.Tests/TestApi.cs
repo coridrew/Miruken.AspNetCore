@@ -16,6 +16,11 @@
         public Person Person { get; set; }
     }
 
+    public class GetPlayer : IRequest<PlayerResponse>
+    {
+        public int PlayerId { get; set; }
+    }
+
     public class CreatePlayer : IRequest<PlayerResponse>
     {
         public Player Player { get; set; }
