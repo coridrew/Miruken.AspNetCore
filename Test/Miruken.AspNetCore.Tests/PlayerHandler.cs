@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Threading;
+    using Api;
     using Callback;
     using Validate;
 
@@ -18,7 +19,7 @@
         {
             if (_players.TryGetValue(get.PlayerId, out var player))
                 return new PlayerResponse { Player = player };
-            throw new InvalidOperationException($"Player {get.PlayerId} not found");
+            throw new NotFoundException($"Player {get.PlayerId} not found");
         }
 
         [Handles]

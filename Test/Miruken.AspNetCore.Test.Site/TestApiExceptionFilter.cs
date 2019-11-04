@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using System.Net;
+    using Api;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Filters;
     using Validate;
@@ -23,7 +24,7 @@
                 response.ContentType = "application/json";
                 context.Result = new ObjectResult(errors);
             }
-            else if (exception.Message.Contains("not found"))
+            else if (exception is NotFoundException)
             {
                 context.ExceptionHandled = true;
                 var response = context.HttpContext.Response;
