@@ -36,8 +36,7 @@
                     Title       = "Test Api",
                     Description = "Swagger Integration with Miruken"
                 });
-                c.CustomSchemaIds(MirukenDocumentFilter.ModelToSchemaId);
-                c.DocumentFilter<MirukenDocumentFilter>();
+                c.AddMiruken();
             });
 
             return services.AddMiruken(configure => configure
