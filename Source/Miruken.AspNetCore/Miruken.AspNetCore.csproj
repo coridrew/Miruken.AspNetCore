@@ -1,8 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>latest</LangVersion>
     <Authors>cneuwirt</Authors>
     <Company>Miruken</Company>
     <Description>Asp.Net Core Integration with Miruken</Description>
@@ -12,21 +11,15 @@
     <PackageIconUrl>https://avatars0.githubusercontent.com/u/20844317</PackageIconUrl>
     <PackageTags>Miruken Asp.Net Core</PackageTags>
     <PackageReleaseNotes>Summary of changes made in this release of the package.</PackageReleaseNotes>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath>bin\</OutputPath>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <LangVersion>latest</LangVersion>
     <OutputPath>bin\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
-    <PackageReference Include="Miruken" Version="3.99.2" />
-    <PackageReference Include="Miruken.Http" Version="3.99.2" />
-    <PackageReference Include="Miruken.Validate" Version="3.99.2" />
+    <PackageReference Include="Miruken" Version="3.99.7" />
+    <PackageReference Include="Miruken.Http" Version="3.99.7" />
+    <PackageReference Include="Miruken.Validate" Version="3.99.7" />
   </ItemGroup>
 
 </Project>
