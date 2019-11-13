@@ -23,10 +23,10 @@
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.AddMvc(config =>
-                {
-                    config.Filters.Add(typeof(TestApiExceptionFilter));
-                })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            {
+                config.Filters.Add(typeof(TestApiExceptionFilter));
+            })
+            .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddSwaggerGen(c =>
             {
