@@ -43,7 +43,7 @@
                 .PublicSources(sources => sources.FromAssemblyOf<PlayerHandler>())
                 .WithAspNet(options => options.AddControllers())
                 .WithValidation()
-            );
+            ).Build();
         }
 
         public void Configure(IApplicationBuilder app)

@@ -33,10 +33,10 @@
             _handler = new ServiceCollection()
                 .AddSingleton(_server)
                 .AddSingleton<TestServerClientHandler>()
-                .AddMiruken(HandlerDescriptorFactory.Current, x => x
+                .AddMiruken(configure => configure
                     .PublicSources(s => s.FromAssemblyOf<HttpRouteControllerTests>())
                     .WithHttp(http => http.AddHttpMessageHandler<TestServerClientHandler>())
-                );
+                ).Build(HandlerDescriptorFactory.Current);
         }
 
         [TestCleanup]
@@ -61,7 +61,8 @@
                 return services.AddMiruken(configure => configure
                     .Sources(sources => sources.FromAssemblyOf<Startup>())
                     .WithAspNet(options => options.AddControllers())
-                    .WithValidation());
+                    .WithValidation())
+                    .Build();
             }
 
             public void Configure(IApplicationBuilder app)
