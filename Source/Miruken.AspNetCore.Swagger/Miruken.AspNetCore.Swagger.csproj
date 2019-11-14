@@ -13,19 +13,18 @@
     <RepositoryType></RepositoryType>
     <PackageTags>Miruken Asp.Net Swagger OpenApi Core</PackageTags>
     <PackageReleaseNotes>Summary of changes made in this release of the package.</PackageReleaseNotes>
+    <OutputPath>bin\</OutputPath>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath>bin\</OutputPath>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <OutputPath>bin\</OutputPath>
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+      <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoFixture" Version="4.11.0" />
     <PackageReference Include="Miruken.Http" Version="3.99.15-Alpha.3" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-19554-01" PrivateAssets="All"/>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
   </ItemGroup>
 
