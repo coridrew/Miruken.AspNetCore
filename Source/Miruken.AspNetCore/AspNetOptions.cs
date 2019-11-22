@@ -115,9 +115,10 @@
                     .UsingRegistrationStrategy(RegistrationStrategy.Skip)
                     .AsSelf());
 
+#if NETSTANDARD2_0
             _services.Replace(ServiceDescriptor
                 .Singleton<ITagHelperActivator, ServiceBasedTagHelperActivator>());
-
+#endif
             return this;
         }
     }

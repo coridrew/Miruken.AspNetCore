@@ -1,4 +1,4 @@
-﻿namespace Miruken.AspNetCore.Test.Site
+﻿namespace Miruken.AspNetCore.Test.Site2_2
 {
     using Microsoft.AspNetCore;
     using Microsoft.AspNetCore.Hosting;

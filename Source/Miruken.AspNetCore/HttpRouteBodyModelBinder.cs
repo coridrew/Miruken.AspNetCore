@@ -1,30 +1,39 @@
 ﻿namespace Miruken.AspNetCore
 {
     using System;
-    using System.Buffers;
     using System.IO;
     using System.Text;
     using System.Threading.Tasks;
-    using Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Formatters;
     using Microsoft.AspNetCore.Mvc.Infrastructure;
     using Microsoft.AspNetCore.Mvc.ModelBinding;
     using Microsoft.Extensions.Logging;
-    using Microsoft.Extensions.ObjectPool;
     using Microsoft.Extensions.Options;
+
+#if NETSTANDARD2_0
+    using System.Buffers;
+    using Microsoft.Extensions.ObjectPool;
+    using Http;
+#endif
 
     public class HttpRouteBodyModelBinder : IModelBinder
     {
+#if NETSTANDARD2_0
         private readonly JsonInputFormatter _input;
+#else
+        private readonly SystemTextJsonInputFormatter _input;
+#endif
         private readonly Func<Stream, Encoding, TextReader> _readerFactory;
 
+#if NETSTANDARD2_0
         public HttpRouteBodyModelBinder(
             IHttpRequestStreamReaderFactory readerFactory,
             ILoggerFactory loggerFactory,
             IOptions<MvcOptions> options, IOptions<MvcJsonOptions> jsonOptions,
             ArrayPool<char> charPool, ObjectPoolProvider objectPoolProvider)
         {
+
             _input = new JsonInputFormatter(
                 loggerFactory.CreateLogger(typeof(HttpRouteBodyModelBinder)),
                 HttpFormatters.Route.SerializerSettings, charPool,
@@ -32,7 +41,17 @@
 
             _readerFactory = readerFactory.CreateReader;         
         }
+#else
+        public HttpRouteBodyModelBinder(
+            IHttpRequestStreamReaderFactory readerFactory,
+            ILoggerFactory loggerFactory)
+        {
+            _input = new SystemTextJsonInputFormatter(new JsonOptions(),
+                loggerFactory.CreateLogger<SystemTextJsonInputFormatter>());
 
+            _readerFactory = readerFactory.CreateReader;
+        }
+#endif
         public async Task BindModelAsync(ModelBindingContext bindingContext)
         {
             var httpContext     = bindingContext.HttpContext;

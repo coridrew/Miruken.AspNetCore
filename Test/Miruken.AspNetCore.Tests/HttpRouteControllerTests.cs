@@ -56,7 +56,10 @@
             public IServiceProvider ConfigureServices(IServiceCollection services)
             {
                 services.AddMvc()
-                    .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+#if NETSTANDARD2_0
+                    .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+#endif
+                    ;
 
                 return services.AddMiruken(configure => configure
                     .Sources(sources => sources.FromAssemblyOf<Startup>())
@@ -67,10 +70,15 @@
 
             public void Configure(IApplicationBuilder app)
             {
+#if NETSTANDARD2_0
                 app.UseMvc();
+#elif NETSTANDARD2_1
+                app.UseRouting()
+                   .UseEndpoints(endpoints => endpoints.MapControllers());
+#endif
             }
         }
-
+        
         [TestMethod]
         public async Task Should_Route_Requests()
         {

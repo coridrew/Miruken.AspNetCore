@@ -1,4 +1,4 @@
-﻿namespace Miruken.AspNetCore.Test.Site
+﻿namespace Miruken.AspNetCore.Test.Site3_0
 {
     using System.Collections.Generic;
     using System.Net;
