@@ -1,15 +1,14 @@
 ﻿namespace Miruken.AspNetCore
 {
     using System.Linq;
+    using System.Reflection;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.ApplicationParts;
     using Microsoft.AspNetCore.Mvc.Controllers;
-    using Microsoft.AspNetCore.Mvc.Razor;
-    using Microsoft.AspNetCore.Mvc.Razor.Internal;
+    using Microsoft.AspNetCore.Mvc.Razor.TagHelpers;
     using Microsoft.AspNetCore.Mvc.RazorPages;
     using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
     using Microsoft.AspNetCore.Mvc.ViewComponents;
-    using Microsoft.AspNetCore.Razor.TagHelpers;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection.Extensions;
     using Register;
@@ -29,6 +28,16 @@
             _parts = services.LastOrDefault(
                     d => d.ServiceType == typeof(ApplicationPartManager))
                 ?.ImplementationInstance as ApplicationPartManager;
+
+            if (_parts != null)
+            {
+                var assembly = typeof(HttpRouteController).Assembly;
+                if (!_parts.ApplicationParts.OfType<AssemblyPart>()
+                    .Any(p => p.Assembly == assembly))
+                {
+                    _parts.ApplicationParts.Add(new AssemblyPart(assembly));
+                }
+            }
         }
 
         public AspNetOptions AddControllers()
@@ -37,6 +46,7 @@
             {
                 var feature = new ControllerFeature();
                 _parts.PopulateFeature(feature);
+                feature.Controllers.Add(typeof(HttpRouteController).GetTypeInfo());
                 var controllerTypes = feature.Controllers.Select(c => c.AsType());
                 _registration.Sources(sources => sources.AddTypes(controllerTypes));
             }
@@ -101,13 +111,10 @@
         {
             if (_parts != null)
             {
-                var tagHelperTypes =
-                    from   part in _parts.ApplicationParts.OfType<IApplicationPartTypeProvider>()
-                    from   type in part.Types
-                    where  typeof(ITagHelper).IsAssignableFrom(type)
-                    where  !type.IsAbstract && !type.IsGenericTypeDefinition
-                    select type;
-                _registration.Sources(sources => sources.AddTypes(tagHelperTypes));
+                var feature = new TagHelperFeature();
+                _parts.PopulateFeature(feature);
+                var viewComponentTypes = feature.TagHelpers.Select(v => v.AsType());
+                _registration.Sources(sources => sources.AddTypes(viewComponentTypes));
             }
 
             _registration.Select((selector, publicOnly) =>
@@ -115,10 +122,6 @@
                     .UsingRegistrationStrategy(RegistrationStrategy.Skip)
                     .AsSelf());
 
-#if NETSTANDARD2_0
-            _services.Replace(ServiceDescriptor
-                .Singleton<ITagHelperActivator, ServiceBasedTagHelperActivator>());
-#endif
             return this;
         }
     }

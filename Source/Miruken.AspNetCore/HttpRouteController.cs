@@ -1,6 +1,7 @@
 ﻿namespace Miruken.AspNetCore
 {
     using System;
+    using System.Buffers;
     using System.Threading;
     using System.Threading.Tasks;
     using Api;
@@ -11,6 +12,7 @@
     using Map;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.Formatters;
     using Newtonsoft.Json;
     using Validate;
 
@@ -44,7 +46,7 @@
             try
             {
                 var response = await Context.Send(request);
-                return new JsonResult(new Message(response), settings);
+                return CreateResult(new Message(response), settings);
             }
             catch (Exception exception)
             {
@@ -73,7 +75,7 @@
             try
             {
                 await Context.Publish(notification);
-                return new JsonResult(new Message(), settings);
+                return CreateResult(new Message(), settings);
             }
             catch (Exception exception)
             {
@@ -95,10 +97,7 @@
             var error = bestEffort.Map<object>(exception, typeof(Exception))
                      ?? new ExceptionData(exception);
 
-            return new JsonResult(new Message(error), settings)
-            {
-                StatusCode = code.Value
-            };
+            return CreateResult(new Message(error), settings, code);
         }
 
         private IActionResult CreateInvalidMessageResponse(
@@ -125,6 +124,26 @@
             var settings = HttpFormatters.Route.SerializerSettings.Copy();
             settings.Converters.Add(new ExceptionJsonConverter(Context));
             return settings;
+        }
+
+        private static IActionResult CreateResult(object value,
+            JsonSerializerSettings settings, int? statusCode = null)
+        {
+#if NETSTANDARD2_0
+            return new JsonResult(value, settings) 
+            {
+                StatusCode = statusCode
+            };
+#elif NETSTANDARD2_1
+            return new ObjectResult(value)
+            {
+                Formatters = { 
+                    new NewtonsoftJsonOutputFormatter(
+                        settings, ArrayPool<char>.Shared, new MvcOptions())
+                },
+                StatusCode = statusCode
+            };
+#endif
         }
     }
 }

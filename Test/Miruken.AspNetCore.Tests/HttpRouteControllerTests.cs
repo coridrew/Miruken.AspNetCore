@@ -8,16 +8,23 @@
     using Callback.Policy;
     using Functional;
     using Http;
-    using Microsoft.AspNetCore;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.TestHost;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Register;
     using Validate;
     using ServiceCollection = Microsoft.Extensions.DependencyInjection.ServiceCollection;
+
+#if NETSTANDARD2_0
+    using Microsoft.AspNetCore;
+    using Microsoft.AspNetCore.Mvc;
+#endif
+
+#if NETSTANDARD2_1
+    using Microsoft.Extensions.Hosting;
+#endif
 
     [TestClass]
     public class HttpRouteControllerTests
@@ -47,19 +54,27 @@
 
         protected virtual TestServer CreateTestServer()
         {
+#if NETSTANDARD2_0
             var builder = WebHost.CreateDefaultBuilder().UseStartup<Startup>();
             return new TestServer(builder);
+#elif NETSTANDARD2_1
+            var host = Host.CreateDefaultBuilder()
+                .ConfigureWebHostDefaults(webBuilder =>
+                    webBuilder.UseStartup<Startup>().UseTestServer())
+                .UseServiceProviderFactory(new MirukenServiceProviderFactory())
+                .Build();
+            host.RunAsync();
+            return host.GetTestServer();
+#endif
         }
 
         private class Startup
         {
+#if NETSTANDARD2_0
             public IServiceProvider ConfigureServices(IServiceCollection services)
             {
                 services.AddMvc()
-#if NETSTANDARD2_0
-                    .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-#endif
-                    ;
+                    .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
                 return services.AddMiruken(configure => configure
                     .Sources(sources => sources.FromAssemblyOf<Startup>())
@@ -67,6 +82,17 @@
                     .WithValidation())
                     .Build();
             }
+#elif NETSTANDARD2_1
+            public void ConfigureServices(IServiceCollection services)
+            {
+                services.AddMvc();
+
+                services.AddMiruken(configure => configure
+                    .Sources(sources => sources.FromAssemblyOf<Startup>())
+                    .WithAspNet(options => options.AddControllers())
+                    .WithValidation());
+            }
+#endif
 
             public void Configure(IApplicationBuilder app)
             {

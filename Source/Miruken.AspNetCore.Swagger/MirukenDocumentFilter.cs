@@ -1,4 +1,5 @@
-﻿namespace Miruken.AspNetCore.Swagger
+﻿#if NETSTANDARD2_0
+namespace Miruken.AspNetCore.Swagger
 {
     using System;
     using System.Collections.Generic;
@@ -197,3 +198,5 @@
         public T Payload { get; set; }
     }
 }
+#endif
+

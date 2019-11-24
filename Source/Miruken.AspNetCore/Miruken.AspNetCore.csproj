@@ -29,10 +29,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Miruken" Version="3.99.15-Alpha.13" />
-    <PackageReference Include="Miruken.Http" Version="3.99.15-Alpha.13" />
+    <PackageReference Include="Miruken" Version="3.99.15-Alpha.15" />
+    <PackageReference Include="Miruken.Http" Version="3.99.15-Alpha.15" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-19554-01" PrivateAssets="All" />
-    <PackageReference Include="Miruken.Validate" Version="3.99.15-Alpha.13" />
+    <PackageReference Include="Miruken.Validate" Version="3.99.15-Alpha.15" />
   </ItemGroup>
 
   <ItemGroup Condition="$(DefineConstants.Contains('NETSTANDARD2_0'))">
@@ -41,7 +41,7 @@
 
   <ItemGroup Condition="$(DefineConstants.Contains('NETSTANDARD2_1'))">
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0" />
   </ItemGroup>
-    
 
 </Project>

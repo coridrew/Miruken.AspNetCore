@@ -5,8 +5,6 @@
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Register;
-    using Swagger;
-    using Swashbuckle.AspNetCore.Swagger;
     using Tests;
     using Validate;
 
@@ -24,17 +22,6 @@
             services.AddMvc(config =>
             {
                 config.Filters.Add(typeof(TestApiExceptionFilter));
-            });
-
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new Info
-                {
-                    Version     = "v1",
-                    Title       = "Test Api",
-                    Description = "Swagger Integration with Miruken"
-                });
-                c.AddMiruken();
             });
 
             return services.AddMiruken(configure => configure
