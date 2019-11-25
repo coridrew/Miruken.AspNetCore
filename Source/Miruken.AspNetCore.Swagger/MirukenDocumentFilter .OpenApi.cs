@@ -1,4 +1,4 @@
-﻿#if NETSTANDARD2_0
+﻿#if NETSTANDARD2_1
 namespace Miruken.AspNetCore.Swagger
 {
     using System;
@@ -11,10 +11,12 @@ namespace Miruken.AspNetCore.Swagger
     using Callback.Policy.Bindings;
     using Http;
     using Http.Format;
+    using Microsoft.OpenApi.Any;
+    using Microsoft.OpenApi.Models;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
-    using Swashbuckle.AspNetCore.Swagger;
     using Swashbuckle.AspNetCore.SwaggerGen;
+    using OperationType = Microsoft.OpenApi.Models.OperationType;
 
     public class MirukenDocumentFilter : IDocumentFilter
     {
@@ -52,32 +54,26 @@ namespace Miruken.AspNetCore.Swagger
             return type.FullName;
         }
 
-        public event Func<Operation, bool> Operations;
+        public event Func<OpenApiOperation, bool> Operations;
 
-
-        public void Apply(SwaggerDocument document, DocumentFilterContext context)
+        public void Apply(OpenApiDocument document, DocumentFilterContext context)
         {
-            var registry = context.SchemaRegistry;
-
             var bindings = Handles.Policy.GetMethods();
-            AddPaths(document, registry, "process", bindings);
-
-            var messageName = typeof(Message).FullName ?? "Message";
-            document.Definitions[messageName].Example = new Message();
+            AddPaths(document, context, "process", bindings);
         }
 
-        private void AddPaths(SwaggerDocument document, ISchemaRegistry registry,
+        private void AddPaths(OpenApiDocument document, DocumentFilterContext context,
             string resource, IEnumerable<PolicyMemberBinding> bindings)
         {
-            foreach (var path in BuildPaths(resource, registry, bindings))
+            foreach (var path in BuildPaths(resource, context, bindings))
             {
                 if (!document.Paths.ContainsKey(path.Item1))
                     document.Paths.Add(path.Item1, path.Item2);
             }
         }
 
-        private IEnumerable<Tuple<string, PathItem>> BuildPaths(
-            string resource, ISchemaRegistry registry,
+        private IEnumerable<Tuple<string, OpenApiPathItem>> BuildPaths(
+            string resource, DocumentFilterContext context,
             IEnumerable<PolicyMemberBinding> bindings)
         {
             return bindings.Select(x =>
@@ -90,84 +86,114 @@ namespace Miruken.AspNetCore.Swagger
                 var handler        = x.Dispatcher.Owner.HandlerType;
                 var assembly       = requestType.Assembly.GetName();
                 var tag            = $"{assembly.Name} - {assembly.Version}";
-                var requestSchema  = GetMessageSchema(registry, requestType);
-                var responseSchema = GetMessageSchema(registry, responseType);
+                var requestSchema  = GetMessageSchema(requestType, context);
+                var responseSchema = GetMessageSchema(responseType, context);
                 var requestPath    = HttpOptionsExtensions.GetRequestPath(requestType);
 
-                var requestSummary = GetReferencedSchema(registry,
-                    registry.GetOrRegister(requestType))?.Description;
+                var requestSummary =
+                    context.SchemaRepository.Schemas.TryGetValue(
+                        ModelToSchemaId(requestType), out requestSchema)
+                        ? requestSchema.Description
+                        : "";
 
                 var handlerAssembly = handler.Assembly.GetName();
                 var handlerNotes    = $"Handled by {handler.FullName} in {handlerAssembly.Name} - {handlerAssembly.Version}";
 
-                var operation = new Operation
+                var operation = new OpenApiOperation
                 {
                     Summary     = requestSummary,
                     OperationId = requestType.FullName,
                     Description = handlerNotes,
-                    Tags        = new List<string> {tag},
-                    Consumes    = JsonFormats,
-                    Produces    = JsonFormats,
-                    Parameters  = new List<IParameter>
+                    Tags        = new List<OpenApiTag> { new OpenApiTag { Name = tag } },
+                    RequestBody = new OpenApiRequestBody
                     {
-                        new BodyParameter
+                        Reference = new OpenApiReference
                         {
-                            In          = "body",
-                            Name        = "message",
-                            Description = "request to process",
-                            Schema      = requestSchema,
-                            Required    = true
-                        }
+                            Type = ReferenceType.Schema,
+                            Id   = ModelToSchemaId(requestType)
+                        },
+                        Description = "request to process",
+                        Content     = JsonFormats.Select(f =>
+                            new { Format = f, Media = new OpenApiMediaType
+                            {
+                                Schema = requestSchema
+                            } }).ToDictionary(f => f.Format, f => f.Media),
+                        Required    = true
                     },
-                    Responses = new Dictionary<string, Response>
+                    Responses =
                     {
                         {
-                            "200", new Response
+                            "200", new OpenApiResponse
                             {
                                 Description = "OK",
-                                Schema      = responseSchema
+                                Reference = new OpenApiReference
+                                {
+                                    Type = ReferenceType.Schema,
+                                    Id   = ModelToSchemaId(responseType),
+                                },
+                                Content     = JsonFormats.Select(f =>
+                                    new { Format = f, Media = new OpenApiMediaType
+                                    {
+                                        Schema = responseSchema
+                                    } }).ToDictionary(f => f.Format, f => f.Media)
                             }
                         }
                     }
                 };
 
                 if (Operations != null && Operations.GetInvocationList()
-                        .Cast<Func<Operation, bool>>()
+                        .Cast<Func<OpenApiOperation, bool>>()
                         .Any(op => !op(operation)))
                     return null;
 
-                return Tuple.Create($"/{resource}/{requestPath}", new PathItem
+                return Tuple.Create($"/{resource}/{requestPath}", new OpenApiPathItem
                 {
-                    Post = operation
+                    Operations =
+                    {
+                        { OperationType.Post, operation }
+                    }
                 });
             }).Where(p => p != null);
         }
 
-        private static Schema GetReferencedSchema(ISchemaRegistry registry, Schema reference)
+        private OpenApiSchema GetMessageSchema(Type message, DocumentFilterContext context)
         {
-            var parts = reference.Ref.Split('/');
-            var name = parts.Last();
-            return registry.Definitions[name];
-        }
+            var repository = context.SchemaRepository;
+            var generator  = context.SchemaGenerator;
 
-        private Schema GetMessageSchema(ISchemaRegistry registry, Type message)
-        {
             if (message == null || message == typeof(void) || message == typeof(object))
-                return registry.GetOrRegister(typeof(Message));
-            var schema = registry.GetOrRegister(typeof(Message<>).MakeGenericType(message));
-            var definition = GetReferencedSchema(registry, schema);
-            definition.Example = CreateExampleMessage(message);
-            return schema;
+            {
+                return repository.GetOrAdd(
+                    typeof(Message),
+                    ModelToSchemaId(typeof(Message)),
+                    () =>
+                    {
+                        var s = generator.GenerateSchema(typeof(Message), repository);
+                        var jsonString = JsonConvert.SerializeObject(new Message(), SerializerSettings);
+                        s.Example = new OpenApiString(jsonString);
+                        return s;
+                    });
+            }
+
+            var genericMessage = typeof(Message<>).MakeGenericType(message);
+            var schema = repository.GetOrAdd(genericMessage, ModelToSchemaId(genericMessage),
+                () =>
+                {
+                    var s = generator.GenerateSchema(genericMessage, repository);
+                    s.Example = CreateExampleMessage(message);
+                    return s;
+                });
+             return schema;
         }
 
-        private object CreateExampleMessage(Type message)
+        private IOpenApiAny CreateExampleMessage(Type message)
         {
             try
             {
                 var creator    = CreateExampleMethod.MakeGenericMethod(message);
                 var example    = creator.Invoke(null, new object[] { _examples });
                 var jsonString = JsonConvert.SerializeObject(example, SerializerSettings);
-                return JsonConvert.DeserializeObject(jsonString);
+                return new OpenApiString(jsonString);
             }
             catch
             {

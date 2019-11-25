@@ -31,12 +31,12 @@
             var settings = CreateSerializerSettings();
 
             if (!ModelState.IsValid)
-                return CreateInvalidMessageResponse(settings);
+                return CreateInvalidResult(settings);
 
             var request = message?.Payload;
             if (request == null)
             {
-                return CreateErrorResponse(new ArgumentException(
+                return CreateErrorResult(new ArgumentException(
                         "Request payload is missing"), settings,
                     StatusCodes.Status400BadRequest);
             }
@@ -50,7 +50,7 @@
             }
             catch (Exception exception)
             {
-                return CreateErrorResponse(exception, settings);
+                return CreateErrorResult(exception, settings);
             }
         }
 
@@ -60,12 +60,12 @@
             var settings = CreateSerializerSettings();
 
             if (!ModelState.IsValid)
-                return CreateInvalidMessageResponse(settings);
+                return CreateInvalidResult(settings);
 
             var notification = message?.Payload;
             if (notification == null)
             {
-                return CreateErrorResponse(new ArgumentException(
+                return CreateErrorResult(new ArgumentException(
                         "Notification payload is missing"), settings,
                     StatusCodes.Status400BadRequest);
             }
@@ -79,51 +79,8 @@
             }
             catch (Exception exception)
             {
-                return CreateErrorResponse(exception, settings);
+                return CreateErrorResult(exception, settings);
             }
-        }
-
-        private IActionResult CreateErrorResponse(Exception exception,
-            JsonSerializerSettings settings, int? code = null)
-        {
-            var bestEffort = Context.BestEffort();
-
-            if (!code.HasValue)
-            {
-                code = bestEffort.Map<int>(exception);
-                if (code == 0) code = StatusCodes.Status500InternalServerError;
-            }
-
-            var error = bestEffort.Map<object>(exception, typeof(Exception))
-                     ?? new ExceptionData(exception);
-
-            return CreateResult(new Message(error), settings, code);
-        }
-
-        private IActionResult CreateInvalidMessageResponse(
-            JsonSerializerSettings settings)
-        {
-            var outcome = new ValidationOutcome();
-            foreach (var property in ModelState)
-                foreach (var error in property.Value.Errors)
-                {
-                    var key = property.Key;
-                    if (key.StartsWith("message."))
-                        key = key.Substring(8);
-                    var message = error.Exception?.Message ?? error.ErrorMessage;
-                    outcome.AddError(key, message);
-                }
-
-            return CreateErrorResponse(
-                new ValidationException(outcome), settings,
-                StatusCodes.Status400BadRequest);
-        }
-
-        private JsonSerializerSettings CreateSerializerSettings()
-        {
-            var settings = HttpFormatters.Route.SerializerSettings.Copy();
-            settings.Converters.Add(new ExceptionJsonConverter(Context));
-            return settings;
         }
 
         private static IActionResult CreateResult(object value,
@@ -137,13 +94,55 @@
 #elif NETSTANDARD2_1
             return new ObjectResult(value)
             {
-                Formatters = { 
+                Formatters = {
                     new NewtonsoftJsonOutputFormatter(
                         settings, ArrayPool<char>.Shared, new MvcOptions())
                 },
                 StatusCode = statusCode
             };
 #endif
+        }
+
+        private IActionResult CreateErrorResult(Exception exception,
+            JsonSerializerSettings settings, int? statusCode = null)
+        {
+            var bestEffort = Context.BestEffort();
+
+            if (!statusCode.HasValue)
+            {
+                statusCode = bestEffort.Map<int>(exception);
+                if (statusCode == 0) statusCode = StatusCodes.Status500InternalServerError;
+            }
+
+            var error = bestEffort.Map<object>(exception, typeof(Exception))
+                     ?? new ExceptionData(exception);
+
+            return CreateResult(new Message(error), settings, statusCode);
+        }
+
+        private IActionResult CreateInvalidResult(JsonSerializerSettings settings)
+        {
+            var outcome = new ValidationOutcome();
+            foreach (var property in ModelState)
+                foreach (var error in property.Value.Errors)
+                {
+                    var key = property.Key;
+                    if (key.StartsWith("message."))
+                        key = key.Substring(8);
+                    var message = error.Exception?.Message ?? error.ErrorMessage;
+                    outcome.AddError(key, message);
+                }
+
+            return CreateErrorResult(
+                new ValidationException(outcome), settings,
+                StatusCodes.Status400BadRequest);
+        }
+
+        private JsonSerializerSettings CreateSerializerSettings()
+        {
+            var settings = HttpFormatters.Route.SerializerSettings.Copy();
+            settings.Converters.Add(new ExceptionJsonConverter(Context));
+            return settings;
         }
     }
 }

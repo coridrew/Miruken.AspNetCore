@@ -1,5 +1,4 @@
-﻿#if NETSTANDARD2_0
-namespace Miruken.AspNetCore.Swagger
+﻿namespace Miruken.AspNetCore.Swagger
 {
     using Microsoft.Extensions.DependencyInjection;
     using Swashbuckle.AspNetCore.SwaggerGen;
@@ -14,5 +13,5 @@ namespace Miruken.AspNetCore.Swagger
         }
     }
 }
-#endif
+
 

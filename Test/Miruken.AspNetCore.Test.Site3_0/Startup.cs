@@ -4,7 +4,9 @@
     using Microsoft.AspNetCore.Builder;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.OpenApi.Models;
     using Register;
+    using Swagger;
     using Tests;
     using Validate;
 
@@ -24,6 +26,17 @@
                 config.Filters.Add(typeof(TestApiExceptionFilter));
             });
 
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version     = "v1",
+                    Title       = "Test Api",
+                    Description = "Swagger Integration with Miruken"
+                });
+                c.AddMiruken();
+            });
+
             return services.AddMiruken(configure => configure
                 .PublicSources(sources => sources.FromAssemblyOf<PlayerHandler>())
                 .WithAspNet(options => options.AddControllers())
@@ -33,8 +46,11 @@
 
         public void Configure(IApplicationBuilder app)
         {
+            app.UseRouting()
+                   .UseEndpoints(endpoints => endpoints.MapControllers());
+
             app.UseSwagger()
-                .UseSwaggerUI(c =>
+               .UseSwaggerUI(c =>
                     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Test Api"));
         }
     }
