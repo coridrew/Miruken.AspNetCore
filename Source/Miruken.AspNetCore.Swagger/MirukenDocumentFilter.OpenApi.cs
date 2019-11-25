@@ -29,6 +29,7 @@ namespace Miruken.AspNetCore.Swagger
         private static readonly JsonSerializerSettings SerializerSettings
             = new JsonSerializerSettings
             {
+                Formatting                     = Formatting.Indented,
                 NullValueHandling              = NullValueHandling.Ignore,
                 ContractResolver               = new CamelCasePropertyNamesContractResolver(),
                 TypeNameHandling               = TypeNameHandling.Auto,
@@ -101,18 +102,13 @@ namespace Miruken.AspNetCore.Swagger
                     Tags        = new List<OpenApiTag> { new OpenApiTag { Name = tag } },
                     RequestBody = new OpenApiRequestBody
                     {
-                        Reference = new OpenApiReference
-                        {
-                            Type = ReferenceType.Schema,
-                            Id   = requestSchema.Reference.Id
-                        },
                         Description = "request to process",
                         Content     = JsonFormats.Select(f =>
                             new { Format = f, Media = new OpenApiMediaType
                             {
                                 Schema = requestSchema
                             } }).ToDictionary(f => f.Format, f => f.Media),
-                        Required    = true
+                        Required = true
                     },
                     Responses =
                     {
@@ -120,12 +116,7 @@ namespace Miruken.AspNetCore.Swagger
                             "200", new OpenApiResponse
                             {
                                 Description = "OK",
-                                Reference = new OpenApiReference
-                                {
-                                    Type = ReferenceType.Schema,
-                                    Id   = responseSchema.Reference.Id
-                                },
-                                Content     = JsonFormats.Select(f =>
+                                Content = JsonFormats.Select(f =>
                                     new { Format = f, Media = new OpenApiMediaType
                                     {
                                         Schema = responseSchema
