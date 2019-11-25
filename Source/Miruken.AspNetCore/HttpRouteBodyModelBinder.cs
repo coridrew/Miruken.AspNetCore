@@ -28,7 +28,7 @@
                 loggerFactory.CreateLogger(typeof(HttpRouteBodyModelBinder)),
                 HttpFormatters.Route.SerializerSettings, charPool,
                 objectPoolProvider, new MvcOptions(), new MvcJsonOptions());
-#elif NETSTANDARD2_1
+#elif NETCOREAPP3_0
             _input = new NewtonsoftJsonInputFormatter(
                 loggerFactory.CreateLogger(typeof(HttpRouteBodyModelBinder)),
                 HttpFormatters.Route.SerializerSettings, charPool,

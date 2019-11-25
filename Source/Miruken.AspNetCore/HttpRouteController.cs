@@ -91,7 +91,7 @@
             {
                 StatusCode = statusCode
             };
-#elif NETSTANDARD2_1
+#elif NETCOREAPP3_0
             return new ObjectResult(value)
             {
                 Formatters = {
