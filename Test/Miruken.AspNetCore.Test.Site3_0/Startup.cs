@@ -19,7 +19,7 @@
 
         public IConfiguration Configuration { get; }
 
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc(config =>
             {
@@ -37,11 +37,11 @@
                 c.AddMiruken();
             });
 
-            return services.AddMiruken(configure => configure
+            services.AddMiruken(configure => configure
                 .PublicSources(sources => sources.FromAssemblyOf<PlayerHandler>())
                 .WithAspNet(options => options.AddControllers())
                 .WithValidation()
-            ).Build();
+            );
         }
 
         public void Configure(IApplicationBuilder app)

@@ -104,7 +104,7 @@ namespace Miruken.AspNetCore.Swagger
                         Reference = new OpenApiReference
                         {
                             Type = ReferenceType.Schema,
-                            Id   = ModelToSchemaId(requestType)
+                            Id   = requestSchema.Reference.Id
                         },
                         Description = "request to process",
                         Content     = JsonFormats.Select(f =>
@@ -123,7 +123,7 @@ namespace Miruken.AspNetCore.Swagger
                                 Reference = new OpenApiReference
                                 {
                                     Type = ReferenceType.Schema,
-                                    Id   = ModelToSchemaId(responseType),
+                                    Id   = responseSchema.Reference.Id
                                 },
                                 Content     = JsonFormats.Select(f =>
                                     new { Format = f, Media = new OpenApiMediaType
@@ -169,13 +169,12 @@ namespace Miruken.AspNetCore.Swagger
             }
 
             var genericMessage = typeof(Message<>).MakeGenericType(message);
-            var schema = repository.GetOrAdd(genericMessage, ModelToSchemaId(genericMessage), () =>
+            return repository.GetOrAdd(genericMessage, ModelToSchemaId(genericMessage), () =>
             {
                 var s = generator.GenerateSchema(genericMessage, repository);
                 s.Example = CreateExampleMessage(message);
                 return s;
             });
-             return schema;
         }
 
         private IOpenApiAny CreateExampleMessage(Type message)
