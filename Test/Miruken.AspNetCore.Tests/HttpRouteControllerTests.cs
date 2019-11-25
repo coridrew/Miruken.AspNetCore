@@ -129,7 +129,7 @@
                 Name = "Philippe Coutinho"
             };
             await _handler
-                .Send(new RemovePlayer { Player = player }
+                .Send(new RemovePlayer { PlayerId = player.Id }
                     .RouteTo(_server.BaseAddress.AbsoluteUri));
         }
 

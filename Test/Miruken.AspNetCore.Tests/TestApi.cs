@@ -41,14 +41,9 @@
         public Player Player { get; set; }
     }
 
-    public class RemovePlayer : IRequest<PlayerResponse>
+    public class RemovePlayer
     {
-        public Player Player { get; set; }
-    }
-
-    public class PlayerRemoved
-    {
-        public Player Player { get; set; }
+        public int PlayerId { get; set; }
     }
 
     public class PlayerResponse
@@ -60,7 +55,7 @@
     {
         public CreatePlayerIntegrity()
         {
-            RuleFor(p => p.Player).NotNull();
+            RuleFor(cp => cp.Player).NotNull();
             When(p => p.Player != null, () =>
             {
                 RuleFor(p => p.Player.Id).Equal(0);
@@ -73,11 +68,19 @@
     {
         public UpdatePlayerIntegrity()
         {
-            RuleFor(p => p.Player).NotNull()
+            RuleFor(up => up.Player).NotNull()
                 .DependentRules(() =>
                 {
                     RuleFor(p => p.Player.Id).GreaterThan(0);
                 });
+        }
+    }
+
+    public class RemovePlayerIntegrity : AbstractValidator<RemovePlayer>
+    {
+        public RemovePlayerIntegrity()
+        {
+            RuleFor(rp => rp.PlayerId).GreaterThan(0);
         }
     }
 }

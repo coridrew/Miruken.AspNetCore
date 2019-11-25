@@ -43,18 +43,25 @@
             var updated = await Context.Send(new UpdatePlayer { Player = player });
             _logger.LogInformation("Updated player {Player}",
                 JsonConvert.SerializeObject(updated.Player));
-            return player;
+            return updated.Player;
         }
 
         [HttpPatch, Route("")]
-        public Player PatchPlayer(Player player)
+        public async Task<Player> PatchPlayer(Player player)
         {
-            return player;
+            _logger.LogInformation("Updating player");
+            var updated = await Context.Send(new UpdatePlayer { Player = player });
+            _logger.LogInformation("Updated player {Player}",
+                JsonConvert.SerializeObject(updated.Player));
+            return updated.Player;
         }
 
-        [HttpDelete, Route("{id}")]
-        public void DeletePlayer(int id)
+        [HttpDelete, Route("{playerId}")]
+        public async Task DeletePlayer(int playerId)
         {
+            _logger.LogInformation("Removing player");
+            await Context.Send(new RemovePlayer { PlayerId = playerId });
+            _logger.LogInformation("Removed player {PlayerId}", playerId);
         }
     }
 }

@@ -82,26 +82,20 @@ namespace Miruken.AspNetCore.Swagger
                 if (requestType == null || requestType.IsAbstract ||
                     requestType.ContainsGenericParameters)
                     return null;
-                var responseType   = x.Dispatcher.LogicalReturnType;
-                var handler        = x.Dispatcher.Owner.HandlerType;
-                var assembly       = requestType.Assembly.GetName();
-                var tag            = $"{assembly.Name} - {assembly.Version}";
-                var requestSchema  = GetMessageSchema(requestType, context);
-                var responseSchema = GetMessageSchema(responseType, context);
-                var requestPath    = HttpOptionsExtensions.GetRequestPath(requestType);
 
-                var requestSummary =
-                    context.SchemaRepository.Schemas.TryGetValue(
-                        ModelToSchemaId(requestType), out requestSchema)
-                        ? requestSchema.Description
-                        : "";
-
+                var responseType    = x.Dispatcher.LogicalReturnType;
+                var handler         = x.Dispatcher.Owner.HandlerType;
+                var assembly        = requestType.Assembly.GetName();
+                var tag             = $"{assembly.Name} - {assembly.Version}";
+                var requestSchema   = GetMessageSchema(requestType, context);
+                var responseSchema  = GetMessageSchema(responseType, context);
+                var requestPath     = HttpOptionsExtensions.GetRequestPath(requestType);
                 var handlerAssembly = handler.Assembly.GetName();
                 var handlerNotes    = $"Handled by {handler.FullName} in {handlerAssembly.Name} - {handlerAssembly.Version}";
 
                 var operation = new OpenApiOperation
                 {
-                    Summary     = requestSummary,
+                    Summary     = requestSchema.Description,
                     OperationId = requestType.FullName,
                     Description = handlerNotes,
                     Tags        = new List<OpenApiTag> { new OpenApiTag { Name = tag } },
@@ -165,8 +159,7 @@ namespace Miruken.AspNetCore.Swagger
             {
                 return repository.GetOrAdd(
                     typeof(Message),
-                    ModelToSchemaId(typeof(Message)),
-                    () =>
+                    ModelToSchemaId(typeof(Message)), () =>
                     {
                         var s = generator.GenerateSchema(typeof(Message), repository);
                         var jsonString = JsonConvert.SerializeObject(new Message(), SerializerSettings);
@@ -176,13 +169,12 @@ namespace Miruken.AspNetCore.Swagger
             }
 
             var genericMessage = typeof(Message<>).MakeGenericType(message);
-            var schema = repository.GetOrAdd(genericMessage, ModelToSchemaId(genericMessage),
-                () =>
-                {
-                    var s = generator.GenerateSchema(genericMessage, repository);
-                    s.Example = CreateExampleMessage(message);
-                    return s;
-                });
+            var schema = repository.GetOrAdd(genericMessage, ModelToSchemaId(genericMessage), () =>
+            {
+                var s = generator.GenerateSchema(genericMessage, repository);
+                s.Example = CreateExampleMessage(message);
+                return s;
+            });
              return schema;
         }
 

@@ -11,7 +11,6 @@
     public class PlayerHandler : Handler
     {
         private static int _id;
-
         private readonly Dictionary<int, Player> _players = new Dictionary<int, Player>();
 
         [Handles]
@@ -42,19 +41,17 @@
                     player.Name = updatedPlayer.Name;
                 if (updatedPlayer.Person != null)
                     player.Person = updatedPlayer.Person;
-                return new PlayerResponse { Player = update.Player };
+                return new PlayerResponse { Player = player };
             }
             throw new InvalidOperationException($"Player {updatedPlayer.Id} not found");
         }
 
         [Handles]
-        public void Created(PlayerCreated created)
+        public void Remove(RemovePlayer remove)
         {
-        }
-
-        [Handles]
-        public void Updated(PlayerUpdated updated)
-        {
+            if (!_players.ContainsKey(remove.PlayerId))
+                throw new NotFoundException($"Player {remove.PlayerId} not found");
+            _players.Remove(remove.PlayerId);
         }
     }
 }
