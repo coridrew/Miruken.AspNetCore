@@ -85,7 +85,7 @@
 #elif NETSTANDARD2_1
             public void ConfigureServices(IServiceCollection services)
             {
-                services.AddMvc();
+                services.AddMvcCore();
 
                 services.AddMiruken(configure => configure
                     .Sources(sources => sources.FromAssemblyOf<Startup>())
@@ -120,7 +120,7 @@
         }
 
         [TestMethod,
-         ExpectedException(typeof(NotSupportedException))]
+         ExpectedException(typeof(NotFoundException))]
         public async Task Should_Fail_Unhandled_Requests()
         {
             var player = new Player

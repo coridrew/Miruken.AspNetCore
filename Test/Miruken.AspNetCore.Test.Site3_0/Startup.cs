@@ -1,6 +1,5 @@
 ﻿namespace Miruken.AspNetCore.Test.Site3_0
 {
-    using System;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -47,7 +46,7 @@
         public void Configure(IApplicationBuilder app)
         {
             app.UseRouting()
-                   .UseEndpoints(endpoints => endpoints.MapControllers());
+               .UseEndpoints(endpoints => endpoints.MapControllers());
 
             app.UseSwagger()
                .UseSwaggerUI(c =>
