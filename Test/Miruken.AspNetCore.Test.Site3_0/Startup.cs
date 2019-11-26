@@ -46,11 +46,15 @@
         public void Configure(IApplicationBuilder app)
         {
             app.UseRouting()
-               .UseEndpoints(endpoints => endpoints.MapControllers());
+                .UseEndpoints(endpoints => endpoints.MapControllers());
 
             app.UseSwagger()
-               .UseSwaggerUI(c =>
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Test Api"));
+                .UseSwaggerUI(c =>
+                {
+                    c.DisplayRequestDuration();
+                    c.DefaultModelsExpandDepth(-1);
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Test Api");
+                });
         }
     }
 }

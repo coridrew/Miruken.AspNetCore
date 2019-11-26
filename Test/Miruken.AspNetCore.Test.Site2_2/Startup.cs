@@ -51,7 +51,11 @@
             app.UseMvc()
                 .UseSwagger()
                 .UseSwaggerUI(c =>
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Test Api"));
+                {
+                    c.DisplayRequestDuration();
+                    c.DefaultModelsExpandDepth(-1);
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Test Api");
+                });
         }
     }
 }

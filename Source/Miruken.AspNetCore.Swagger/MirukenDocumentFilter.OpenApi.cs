@@ -44,7 +44,15 @@ namespace Miruken.AspNetCore.Swagger
             _examples = CreateExamplesGenerator();
         }
 
-        public static string ModelToSchemaId(Type type)
+        public event Func<OpenApiOperation, bool> Operations;
+
+        public void Apply(OpenApiDocument document, DocumentFilterContext context)
+        {
+            var bindings = Handles.Policy.GetMethods();
+            AddPaths(document, context, "process", bindings);
+        }
+
+        private static string ModelToSchemaId(Type type)
         {
             if (type.IsGenericType &&
                 type.GetGenericTypeDefinition() == typeof(Message<>))
@@ -55,21 +63,13 @@ namespace Miruken.AspNetCore.Swagger
             return type.FullName;
         }
 
-        public event Func<OpenApiOperation, bool> Operations;
-
-        public void Apply(OpenApiDocument document, DocumentFilterContext context)
-        {
-            var bindings = Handles.Policy.GetMethods();
-            AddPaths(document, context, "process", bindings);
-        }
-
         private void AddPaths(OpenApiDocument document, DocumentFilterContext context,
             string resource, IEnumerable<PolicyMemberBinding> bindings)
         {
-            foreach (var path in BuildPaths(resource, context, bindings))
+            foreach (var (key, path) in BuildPaths(resource, context, bindings))
             {
-                if (!document.Paths.ContainsKey(path.Item1))
-                    document.Paths.Add(path.Item1, path.Item2);
+                if (!document.Paths.ContainsKey(key))
+                    document.Paths.Add(key, path);
             }
         }
 
