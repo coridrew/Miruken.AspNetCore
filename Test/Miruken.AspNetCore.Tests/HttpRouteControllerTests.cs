@@ -179,9 +179,9 @@
             Assert.AreEqual(1, results.Length);
             var groups = (object[])results[0];
             Assert.AreEqual(1, groups.Length);
-            var group = (Tuple<string, object[]>)groups[0];
-            Assert.AreEqual(_server.BaseAddress.AbsoluteUri, group.Item1);
-            Assert.AreEqual(1, group.Item2.Length);
+            var (url, group) = (Tuple<string, object[]>)groups[0];
+            Assert.AreEqual(_server.BaseAddress.AbsoluteUri, url);
+            Assert.AreEqual(1, group.Length);
         }
 
         [TestMethod]
@@ -215,9 +215,9 @@
             Assert.AreEqual(1, results.Length);
             var groups = (object[])results[0];
             Assert.AreEqual(1, groups.Length);
-            var group = (Tuple<string, object[]>)groups[0];
-            Assert.AreEqual(_server.BaseAddress.AbsoluteUri, group.Item1);
-            Assert.AreEqual(2, group.Item2.Length);
+            var (url, group) = (Tuple<string, object[]>)groups[0];
+            Assert.AreEqual(_server.BaseAddress.AbsoluteUri, url);
+            Assert.AreEqual(2, group.Length);
         }
 
         [TestMethod]
@@ -269,9 +269,9 @@
             Assert.AreEqual(1, results.Length);
             var groups = (object[])results[0];
             Assert.AreEqual(1, groups.Length);
-            var group = (Tuple<string, object[]>)groups[0];
-            Assert.AreEqual(_server.BaseAddress.AbsoluteUri, group.Item1);
-            Assert.AreEqual(2, group.Item2.Length);
+            var (url, group) = (Tuple<string, object[]>)groups[0];
+            Assert.AreEqual(_server.BaseAddress.AbsoluteUri, url);
+            Assert.AreEqual(2, group.Length);
         }
 
         [TestMethod]
@@ -292,9 +292,9 @@
             Assert.AreEqual(1, results.Length);
             var groups = (object[])results[0];
             Assert.AreEqual(1, groups.Length);
-            var group = (Tuple<string, object[]>)groups[0];
-            Assert.AreEqual(_server.BaseAddress.AbsoluteUri, group.Item1);
-            Assert.AreEqual(1, group.Item2.Length);
+            var (url, group) = (Tuple<string, object[]>)groups[0];
+            Assert.AreEqual(_server.BaseAddress.AbsoluteUri, url);
+            Assert.AreEqual(1, group.Length);
         }
 
         [TestMethod]
@@ -333,9 +333,9 @@
             Assert.AreEqual(1, results.Length);
             var groups = (object[])results[0];
             Assert.AreEqual(1, groups.Length);
-            var group = (Tuple<string, object[]>)groups[0];
-            Assert.AreEqual(_server.BaseAddress.AbsoluteUri, group.Item1);
-            Assert.AreEqual(2, group.Item2.Length);
+            var (url, group) = (Tuple<string, object[]>)groups[0];
+            Assert.AreEqual(_server.BaseAddress.AbsoluteUri, url);
+            Assert.AreEqual(2, group.Length);
         }
 
         [TestMethod]
