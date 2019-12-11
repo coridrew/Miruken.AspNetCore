@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.0;netcoreapp2.2</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;netcoreapp2.2</TargetFrameworks>
   </PropertyGroup>
 
   <!-- compilation flags -->
@@ -9,12 +9,11 @@
     <DefineConstants>NETSTANDARD;NETSTANDARD2_0</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp3.0'">
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
     <DefineConstants>NETSTANDARD;NETSTANDARD2_1</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
     <PackageReference Include="Miruken" Version="3.99.15-Alpha.23" />
     <PackageReference Include="Miruken.Validate" Version="3.99.15-Alpha.23" />
@@ -23,11 +22,12 @@
   </ItemGroup>
 
   <ItemGroup Condition="$(DefineConstants.Contains('NETSTANDARD2_0'))">
+    <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup Condition="$(DefineConstants.Contains('NETSTANDARD2_1'))">
-    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="3.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="3.1.0" />
   </ItemGroup>
 
   <ItemGroup>
