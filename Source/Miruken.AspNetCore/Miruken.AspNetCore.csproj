@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.0;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;netstandard2.0</TargetFrameworks>
     <Authors>cneuwirt</Authors>
     <Company>Miruken</Company>
     <Description>Asp.Net Core Integration with Miruken</Description>
@@ -24,15 +24,15 @@
     <DefineConstants>NETSTANDARD;NETSTANDARD2_0</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp3.0'">
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
     <DefineConstants>NETSTANDARD;NETCOREAPP3_0</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Miruken" Version="3.99.15-Alpha.24" />
-    <PackageReference Include="Miruken.Http" Version="3.99.15-Alpha.24" />
+    <PackageReference Include="Miruken" Version="3.99.15-Alpha.25" />
+    <PackageReference Include="Miruken.Http" Version="3.99.15-Alpha.25" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-19554-01" PrivateAssets="All" />
-    <PackageReference Include="Miruken.Validate" Version="3.99.15-Alpha.24" />
+    <PackageReference Include="Miruken.Validate" Version="3.99.15-Alpha.25" />
   </ItemGroup>
 
   <ItemGroup Condition="$(DefineConstants.Contains('NETSTANDARD2_0'))">
@@ -41,7 +41,7 @@
 
   <ItemGroup Condition="$(DefineConstants.Contains('NETCOREAPP3_0'))">
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.0" />
   </ItemGroup>
 
 </Project>

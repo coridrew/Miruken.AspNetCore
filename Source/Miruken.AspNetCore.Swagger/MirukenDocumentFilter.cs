@@ -54,7 +54,6 @@ namespace Miruken.AspNetCore.Swagger
 
         public event Func<Operation, bool> Operations;
 
-
         public void Apply(SwaggerDocument document, DocumentFilterContext context)
         {
             var registry = context.SchemaRegistry;
