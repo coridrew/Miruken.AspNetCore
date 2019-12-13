@@ -39,25 +39,33 @@
                 case ArgumentException _:
                 {
                     context.ExceptionHandled = true;
-                    var response = context.HttpContext.Response;
+                    var response        = context.HttpContext.Response;
                     response.StatusCode = (int) HttpStatusCode.BadRequest;
-                    context.Result = new ObjectResult(exception.Message);
+                    context.Result      = new ObjectResult(exception.Message);
+                    break;
+                }
+                case NotSupportedException _:
+                {
+                    context.ExceptionHandled = true;
+                    var response        = context.HttpContext.Response;
+                    response.StatusCode = (int)HttpStatusCode.NotImplemented;
+                    context.Result      = new ObjectResult(exception.Message);
                     break;
                 }
                 case AuthenticationException _:
                 {
                     context.ExceptionHandled = true;
-                    var response = context.HttpContext.Response;
+                    var response        = context.HttpContext.Response;
                     response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                    context.Result = new ObjectResult(exception.Message);
+                    context.Result      = new ObjectResult(exception.Message);
                     break;
                 }
                 case UnauthorizedAccessException _:
                 {
                     context.ExceptionHandled = true;
-                    var response = context.HttpContext.Response;
+                    var response        = context.HttpContext.Response;
                     response.StatusCode = (int)HttpStatusCode.Forbidden;
-                    context.Result = new ObjectResult(exception.Message);
+                    context.Result      = new ObjectResult(exception.Message);
                     break;
                 }
             }
