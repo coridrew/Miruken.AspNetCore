@@ -20,6 +20,7 @@ namespace Miruken.AspNetCore.Swagger
 
     public class MirukenDocumentFilter : IDocumentFilter
     {
+        private readonly Predicate<OpenApiOperation> _operationFilter;
         private readonly Fixture _examples;
 
         private static readonly MethodInfo CreateExampleMethod =
@@ -39,18 +40,36 @@ namespace Miruken.AspNetCore.Swagger
 
         private static readonly string[] JsonFormats = { "application/json" };
 
-        public MirukenDocumentFilter()
+        public MirukenDocumentFilter(Predicate<OpenApiOperation> operationFilter)
         {
-            _examples = CreateExamplesGenerator();
+            _operationFilter = operationFilter;
+            _examples        = CreateExamplesGenerator();
         }
-
-        public event Func<OpenApiOperation, bool> Operations;
 
         public void Apply(OpenApiDocument document, DocumentFilterContext context)
         {
+            if (_operationFilter != null)
+            {
+                var pathsToRemove = document.Paths
+                    .Where(pathItem => pathItem.Value.Operations.Values.Any(op =>
+                        _operationFilter?.Invoke(op) == false))
+                    .ToList();
+
+                foreach (var item in pathsToRemove)
+                    document.Paths.Remove(item.Key);
+            }
+
             var bindings = Handles.Policy.GetMethods();
             AddPaths(document, context, "process", bindings);
         }
+
+        public static bool NoInfrastructure(OpenApiOperation operation)
+        {
+            return operation == null || !operation.Tags.Any(tag =>
+                       InfrastructureTags.Any(t => tag.Name.StartsWith(t)));
+        }
+
+        private static readonly string[] InfrastructureTags = { "Miruken", "HttpRoute"};
 
         private static string ModelToSchemaId(Type type)
         {
@@ -126,9 +145,7 @@ namespace Miruken.AspNetCore.Swagger
                     }
                 };
 
-                if (Operations != null && Operations.GetInvocationList()
-                        .Cast<Func<OpenApiOperation, bool>>()
-                        .Any(op => !op(operation)))
+                if (_operationFilter.Invoke(operation) == false)
                     return null;
 
                 return Tuple.Create($"/{resource}/{requestPath}", new OpenApiPathItem

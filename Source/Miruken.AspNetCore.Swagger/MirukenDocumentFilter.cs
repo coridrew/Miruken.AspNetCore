@@ -18,6 +18,7 @@ namespace Miruken.AspNetCore.Swagger
 
     public class MirukenDocumentFilter : IDocumentFilter
     {
+        private readonly Predicate<Operation> _operationFilter;
         private readonly Fixture _examples;
 
         private static readonly MethodInfo CreateExampleMethod =
@@ -36,10 +37,19 @@ namespace Miruken.AspNetCore.Swagger
 
         private static readonly string[] JsonFormats = { "application/json" };
 
-        public MirukenDocumentFilter()
+        public MirukenDocumentFilter(Predicate<Operation> operationFilter)
         {
-            _examples = CreateExamplesGenerator();
+            _operationFilter = operationFilter;
+            _examples        = CreateExamplesGenerator();
         }
+
+        public static bool NoInfrastructure(Operation operation)
+        {
+            return operation == null || !operation.Tags.Any(tag =>
+                       InfrastructureTags.Any(t => tag?.StartsWith(t) == true));
+        }
+
+        private static readonly string[] InfrastructureTags = { "Miruken", "HttpRoute" };
 
         public static string ModelToSchemaId(Type type)
         {
@@ -52,11 +62,28 @@ namespace Miruken.AspNetCore.Swagger
             return type.FullName;
         }
 
-        public event Func<Operation, bool> Operations;
-
         public void Apply(SwaggerDocument document, DocumentFilterContext context)
         {
             var registry = context.SchemaRegistry;
+
+            if (_operationFilter != null)
+            {
+                var pathsToRemove = document.Paths.Where(pathItem =>
+                    {
+                        var path = pathItem.Value;
+                        if (!_operationFilter(path.Get)) return true;
+                        if (!_operationFilter(path.Delete)) return true;
+                        if (!_operationFilter(path.Head)) return true;
+                        if (!_operationFilter(path.Options)) return true;
+                        if (!_operationFilter(path.Patch)) return true;
+                        if (!_operationFilter(path.Post)) return true;
+                        return !_operationFilter(path.Put);
+                    })
+                    .ToList();
+
+                foreach (var item in pathsToRemove)
+                    document.Paths.Remove(item.Key);
+            }
 
             var bindings = Handles.Policy.GetMethods();
             AddPaths(document, registry, "process", bindings);
@@ -68,10 +95,10 @@ namespace Miruken.AspNetCore.Swagger
         private void AddPaths(SwaggerDocument document, ISchemaRegistry registry,
             string resource, IEnumerable<PolicyMemberBinding> bindings)
         {
-            foreach (var path in BuildPaths(resource, registry, bindings))
+            foreach (var (key, path) in BuildPaths(resource, registry, bindings))
             {
-                if (!document.Paths.ContainsKey(path.Item1))
-                    document.Paths.Add(path.Item1, path.Item2);
+                if (!document.Paths.ContainsKey(key))
+                    document.Paths.Add(key, path);
             }
         }
 
@@ -130,9 +157,7 @@ namespace Miruken.AspNetCore.Swagger
                     }
                 };
 
-                if (Operations != null && Operations.GetInvocationList()
-                        .Cast<Func<Operation, bool>>()
-                        .Any(op => !op(operation)))
+                if (_operationFilter.Invoke(operation) == false)
                     return null;
 
                 return Tuple.Create($"/{resource}/{requestPath}", new PathItem
