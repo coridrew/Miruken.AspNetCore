@@ -24,7 +24,7 @@
         {
             services.AddMvc(config =>
             {
-                config.Filters.Add(typeof(TestApiExceptionFilter));
+                config.Filters.Add(typeof(ApiExceptionFilter));
             })
             .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 

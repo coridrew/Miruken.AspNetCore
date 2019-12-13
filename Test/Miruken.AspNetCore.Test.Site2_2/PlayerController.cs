@@ -1,4 +1,4 @@
-﻿namespace Miruken.AspNetCore.Test.Site2_2.Controllers
+﻿namespace Miruken.AspNetCore.Test.Site2_2
 {
     using System.Threading.Tasks;
     using Api;

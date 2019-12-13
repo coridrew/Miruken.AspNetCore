@@ -22,7 +22,7 @@ namespace Miruken.AspNetCore.Test.Site3_1
         {
             services.AddMvc(config =>
             {
-                config.Filters.Add(typeof(TestApiExceptionFilter));
+                config.Filters.Add(typeof(ApiExceptionFilter));
             });
 
             services.AddSwaggerGen(c =>

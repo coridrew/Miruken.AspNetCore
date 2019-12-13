@@ -1,15 +1,17 @@
-﻿namespace Miruken.AspNetCore.Test.Site3_1
+﻿namespace Miruken.AspNetCore
 {
+    using System;
     using System.Collections.Generic;
     using System.Net;
+    using System.Security.Authentication;
     using Api;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Filters;
     using Validate;
 
-    public class TestApiExceptionFilter : IExceptionFilter
+    public class ApiExceptionFilter : IExceptionFilter
     {
-        public void OnException(ExceptionContext context)
+        public virtual void OnException(ExceptionContext context)
         {
             var exception = context.Exception;
 
@@ -19,7 +21,6 @@
                 {
                     var errors = new List<string>();
                     CollectErrors(validationException.Outcome, errors);
-
                     context.ExceptionHandled = true;
                     var response = context.HttpContext.Response;
                     response.StatusCode  = 422;
@@ -33,6 +34,30 @@
                     var response        = context.HttpContext.Response;
                     response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Result      = new ObjectResult(exception.Message);
+                    break;
+                }
+                case ArgumentException _:
+                {
+                    context.ExceptionHandled = true;
+                    var response = context.HttpContext.Response;
+                    response.StatusCode = (int) HttpStatusCode.BadRequest;
+                    context.Result = new ObjectResult(exception.Message);
+                    break;
+                }
+                case AuthenticationException _:
+                {
+                    context.ExceptionHandled = true;
+                    var response = context.HttpContext.Response;
+                    response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                    context.Result = new ObjectResult(exception.Message);
+                    break;
+                }
+                case UnauthorizedAccessException _:
+                {
+                    context.ExceptionHandled = true;
+                    var response = context.HttpContext.Response;
+                    response.StatusCode = (int)HttpStatusCode.Forbidden;
+                    context.Result = new ObjectResult(exception.Message);
                     break;
                 }
             }
