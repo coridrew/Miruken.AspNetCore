@@ -46,6 +46,8 @@
             try
             {
                 var response = await Context.Send(request);
+                if (response?.GetType().Name == "VoidTaskResult")
+                    response = null;
                 return CreateResult(new Message(response), settings);
             }
             catch (Exception exception)
