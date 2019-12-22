@@ -113,6 +113,9 @@ namespace Miruken.AspNetCore.Swagger
                 var handlerAssembly = handler.Assembly.GetName();
                 var handlerNotes    = $"Handled by {handler.FullName} in {handlerAssembly.Name} - {handlerAssembly.Version}";
 
+                var validationErrorsSchema = context.SchemaGenerator.GenerateSchema(
+                    typeof(ValidationErrors[]), context.SchemaRepository);
+
                 var operation = new OpenApiOperation
                 {
                     Summary     = requestSchema.Description,
@@ -139,6 +142,17 @@ namespace Miruken.AspNetCore.Swagger
                                     new { Format = f, Media = new OpenApiMediaType
                                     {
                                         Schema = responseSchema
+                                    } }).ToDictionary(f => f.Format, f => f.Media)
+                            }
+                        },
+                        {
+                            "422", new OpenApiResponse
+                            {
+                                Description = "Validation Errors",
+                                Content = JsonFormats.Select(f =>
+                                    new { Format = f, Media = new OpenApiMediaType
+                                    {
+                                        Schema = validationErrorsSchema
                                     } }).ToDictionary(f => f.Format, f => f.Media)
                             }
                         }
@@ -218,6 +232,13 @@ namespace Miruken.AspNetCore.Swagger
     {
         [JsonProperty(TypeNameHandling = TypeNameHandling.All)]
         public T Payload { get; set; }
+    }
+
+    public class ValidationErrors
+    {
+        public string             PropertyName { get; set; }
+        public string[]           Errors       { get; set; }
+        public ValidationErrors[] Nested       { get; set; }
     }
 }
 #endif

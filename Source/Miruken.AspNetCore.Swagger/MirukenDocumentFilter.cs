@@ -126,6 +126,8 @@ namespace Miruken.AspNetCore.Swagger
                 var handlerAssembly = handler.Assembly.GetName();
                 var handlerNotes    = $"Handled by {handler.FullName} in {handlerAssembly.Name} - {handlerAssembly.Version}";
 
+                var validationErrorsSchema = registry.GetOrRegister(typeof(ValidationErrors[]));
+
                 var operation = new Operation
                 {
                     Summary     = requestSummary,
@@ -152,6 +154,13 @@ namespace Miruken.AspNetCore.Swagger
                             {
                                 Description = "OK",
                                 Schema      = responseSchema
+                            }
+                        },
+                        {
+                            "422", new Response
+                            {
+                                Description = "Validation Errors",
+                                Schema      = validationErrorsSchema
                             }
                         }
                     }
@@ -217,6 +226,13 @@ namespace Miruken.AspNetCore.Swagger
     {
         [JsonProperty(TypeNameHandling = TypeNameHandling.All)]
         public T Payload { get; set; }
+    }
+
+    public class ValidationErrors
+    {
+        public string             PropertyName { get; set; }
+        public string[]           Errors       { get; set; }
+        public ValidationErrors[] Nested       { get; set; }
     }
 }
 #endif
