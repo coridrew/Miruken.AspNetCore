@@ -96,6 +96,25 @@ namespace Miruken.AspNetCore.Swagger
             string resource, DocumentFilterContext context,
             IEnumerable<PolicyMemberBinding> bindings)
         {
+            var validationErrorsSchema = context.SchemaGenerator.GenerateSchema(
+                typeof(ValidationErrors[]), context.SchemaRepository);
+            validationErrorsSchema.Example = CreateExampleJson(new[]
+            {
+                new ValidationErrors
+                {
+                    PropertyName = "SomeProperty",
+                    Errors       = new [] { "'Some Property' is required" },
+                    Nested       = new []
+                    {
+                        new ValidationErrors
+                        {
+                            PropertyName = "NestedProperty",
+                            Errors       = new [] { "'Nested Property' not in range"}
+                        }
+                    }
+                }
+            });
+
             return bindings.Select(x =>
             {
                 var requestType = x.Key as Type;
@@ -112,9 +131,6 @@ namespace Miruken.AspNetCore.Swagger
                 var requestPath     = HttpOptionsExtensions.GetRequestPath(requestType);
                 var handlerAssembly = handler.Assembly.GetName();
                 var handlerNotes    = $"Handled by {handler.FullName} in {handlerAssembly.Name} - {handlerAssembly.Version}";
-
-                var validationErrorsSchema = context.SchemaGenerator.GenerateSchema(
-                    typeof(ValidationErrors[]), context.SchemaRepository);
 
                 var operation = new OpenApiOperation
                 {
@@ -184,8 +200,7 @@ namespace Miruken.AspNetCore.Swagger
                     ModelToSchemaId(typeof(Message)), () =>
                     {
                         var s = generator.GenerateSchema(typeof(Message), repository);
-                        var jsonString = JsonConvert.SerializeObject(new Message(), SerializerSettings);
-                        s.Example = new OpenApiString(jsonString);
+                        s.Example = CreateExampleJson(new Message());
                         return s;
                     });
             }
@@ -203,15 +218,20 @@ namespace Miruken.AspNetCore.Swagger
         {
             try
             {
-                var creator    = CreateExampleMethod.MakeGenericMethod(message);
-                var example    = creator.Invoke(null, new object[] { _examples });
-                var jsonString = JsonConvert.SerializeObject(example, SerializerSettings);
-                return new OpenApiString(jsonString);
+                var creator = CreateExampleMethod.MakeGenericMethod(message);
+                var example = creator.Invoke(null, new object[] { _examples });
+                return CreateExampleJson(example);
             }
             catch
             {
                 return null;
             }
+        }
+
+        private static OpenApiString CreateExampleJson(object example)
+        {
+            var jsonString = JsonConvert.SerializeObject(example, SerializerSettings);
+            return new OpenApiString(jsonString);
         }
 
         private static Message<T> CreateExample<T>(ISpecimenBuilder builder)

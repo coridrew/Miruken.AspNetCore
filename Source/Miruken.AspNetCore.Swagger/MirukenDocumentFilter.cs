@@ -106,6 +106,24 @@ namespace Miruken.AspNetCore.Swagger
             string resource, ISchemaRegistry registry,
             IEnumerable<PolicyMemberBinding> bindings)
         {
+            var validationErrorsSchema = registry.GetOrRegister(typeof(ValidationErrors[]));
+            validationErrorsSchema.Example = new[]
+            {
+                new ValidationErrors
+                {
+                    PropertyName = "SomeProperty",
+                    Errors       = new [] { "'Some Property' is required" },
+                    Nested       = new []
+                    {
+                        new ValidationErrors
+                        {
+                            PropertyName = "NestedProperty",
+                            Errors       = new [] { "'Nested Property' not in range"}
+                        }
+                    }
+                }
+            };
+
             return bindings.Select(x =>
             {
                 var requestType = x.Key as Type;
@@ -125,8 +143,6 @@ namespace Miruken.AspNetCore.Swagger
 
                 var handlerAssembly = handler.Assembly.GetName();
                 var handlerNotes    = $"Handled by {handler.FullName} in {handlerAssembly.Name} - {handlerAssembly.Version}";
-
-                var validationErrorsSchema = registry.GetOrRegister(typeof(ValidationErrors[]));
 
                 var operation = new Operation
                 {
