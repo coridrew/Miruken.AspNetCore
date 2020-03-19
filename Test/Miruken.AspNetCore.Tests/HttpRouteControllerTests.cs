@@ -13,6 +13,7 @@
     using Microsoft.AspNetCore.TestHost;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Newtonsoft.Json;
     using Register;
     using Validate;
     using ServiceCollection = Microsoft.Extensions.DependencyInjection.ServiceCollection;
@@ -362,6 +363,52 @@
                 var errors = (ValidationErrors[])error.Payload;
                 Assert.AreEqual(1, errors.Length);
             }, success => { Assert.Fail("Should have failed"); });
+        }
+
+#if NETSTANDARD2_1
+        [TestMethod]
+        public async Task Should_Handle_Unmapped_Errors()
+        {
+            try
+            {
+                await _handler.Send(new CreatePlayer { Player = new Player() }
+                    .RouteTo(new Uri(_server.BaseAddress, "no-mapping").AbsoluteUri));
+            }
+            catch (UnknownExceptionPayload e)
+            {
+                Assert.IsTrue(e.Payload is NoMappingController.SomeError);
+            }
+        }
+#endif
+
+        [TestMethod]
+        public async Task Should_Handle_Missing_Type_Good_Status()
+        {
+            try
+            {
+                await _handler.Send(new CreatePlayer { Player = new Player() }
+                    .RouteTo(new Uri(_server.BaseAddress, "no-type-good").AbsoluteUri));
+                Assert.Fail("Expected JsonSerializationException");
+            }
+            catch (JsonSerializationException e)
+            {
+                Assert.IsTrue(e.Message.Contains("Error resolving type specified in JSON 'Miruken.AspNetCore.Tests.SomeError, Miruken.AspNetCore.Tests'."));
+            }
+        }
+
+        [TestMethod]
+        public async Task Should_Handle_Missing_Type_Bad_Status()
+        {
+            try
+            {
+                await _handler.Send(new CreatePlayer { Player = new Player() }
+                    .RouteTo(new Uri(_server.BaseAddress, "no-type-bad").AbsoluteUri));
+                Assert.Fail("Expected JsonSerializationException");
+            }
+            catch (JsonSerializationException e)
+            {
+                Assert.IsTrue(e.Message.Contains("Error resolving type specified in JSON 'Miruken.AspNetCore.Tests.SomeError, Miruken.AspNetCore.Tests'."));
+            }
         }
     }
 }
