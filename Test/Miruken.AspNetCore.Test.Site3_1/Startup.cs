@@ -29,8 +29,8 @@ namespace Miruken.AspNetCore.Test.Site3_1
             {
                 c.SwaggerDoc("v1", new OpenApiInfo
                 {
-                    Version = "v1",
-                    Title = "Test Api",
+                    Version     = "v1",
+                    Title       = "Test Api",
                     Description = "Swagger Integration with Miruken"
                 });
                 c.AddMiruken();
