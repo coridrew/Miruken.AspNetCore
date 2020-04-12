@@ -1,5 +1,6 @@
 namespace Miruken.AspNetCore.Test.Site3_1
 {
+    using System.Diagnostics;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Hosting;
     using Register;
@@ -8,6 +9,8 @@ namespace Miruken.AspNetCore.Test.Site3_1
     {
         public static void Main(string[] args)
         {
+            Activity.DefaultIdFormat = ActivityIdFormat.W3C;
+
             CreateHostBuilder(args).Build().Run();
         }
 

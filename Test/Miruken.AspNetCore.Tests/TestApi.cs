@@ -3,6 +3,7 @@
     using System;
     using Api;
     using FluentValidation;
+    using Microsoft.AspNetCore.Mvc;
 
     public class Person
     {
@@ -49,6 +50,11 @@
     public class PlayerResponse
     {
         public Player Player { get; set; }
+    }
+
+    public class RenderPlayer : IRequest<IActionResult>
+    {
+        public int PlayerId { get; set; }
     }
 
     public class CreatePlayerIntegrity : AbstractValidator<CreatePlayer>

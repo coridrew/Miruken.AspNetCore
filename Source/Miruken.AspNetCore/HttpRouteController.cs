@@ -45,9 +45,13 @@
 
             try
             {
-                var response = await Context.Send(request);
+                var response = await Context
+                    .With(HttpContext)
+                    .Send(request);
                 if (response?.GetType().Name == "VoidTaskResult")
                     response = null;
+                if (response is IActionResult actionResult)
+                    return actionResult;
                 return CreateResult(new Message(response), settings);
             }
             catch (Exception exception)

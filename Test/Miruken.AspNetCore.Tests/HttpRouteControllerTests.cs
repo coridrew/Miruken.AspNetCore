@@ -1,6 +1,7 @@
 ﻿namespace Miruken.AspNetCore.Tests
 {
     using System;
+    using System.Net.Http;
     using System.Threading.Tasks;
     using Api;
     using Api.Route;
@@ -378,6 +379,23 @@
             {
                 Assert.IsTrue(e.Payload is NoMappingController.SomeError);
             }
+        }
+
+        [TestMethod,
+         ExpectedException(typeof(UnknownExceptionPayload))]
+        public async Task Should_Fail_ActionResult_Requests()
+        {
+            var player = new Player
+            {
+                Name = "Philippe Coutinho"
+            };
+            var response = await _handler
+                .Send(new CreatePlayer { Player = player }
+                    .RouteTo(_server.BaseAddress.AbsoluteUri));
+
+            await _handler
+                .Send(new RenderPlayer { PlayerId = response.Player.Id }
+                    .RouteTo(_server.BaseAddress.AbsoluteUri));
         }
 #endif
 
