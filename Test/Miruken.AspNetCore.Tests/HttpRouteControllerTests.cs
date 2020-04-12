@@ -1,7 +1,6 @@
 ﻿namespace Miruken.AspNetCore.Tests
 {
     using System;
-    using System.Net.Http;
     using System.Threading.Tasks;
     using Api;
     using Api.Route;
