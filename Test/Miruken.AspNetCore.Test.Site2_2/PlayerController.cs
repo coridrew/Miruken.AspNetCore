@@ -4,6 +4,7 @@
     using System.Threading.Tasks;
     using Api;
     using AspNetCore;
+    using Callback;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
     using Newtonsoft.Json;
@@ -81,7 +82,9 @@
             LogActivityInfo();
 
             _logger.LogInformation("Rendering player {0}", playerId);
-            return await Context.Send(new RenderPlayer { PlayerId = playerId });
+            return await Context
+                .With(HttpContext)
+                .Send(new RenderPlayer { PlayerId = playerId });
         }
 
         private void LogActivityInfo()
