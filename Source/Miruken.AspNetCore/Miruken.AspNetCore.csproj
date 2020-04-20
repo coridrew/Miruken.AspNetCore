@@ -37,6 +37,8 @@
 
   <ItemGroup Condition="$(DefineConstants.Contains('NETSTANDARD2_0'))">
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
+    <PackageReference Include="System.Text.Json" Version="4.7.1" />
   </ItemGroup>
 
   <ItemGroup Condition="$(DefineConstants.Contains('NETCOREAPP3_0'))">

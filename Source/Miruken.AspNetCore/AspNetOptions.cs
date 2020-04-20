@@ -14,7 +14,7 @@
     using Register;
     using Scrutor;
 
-    public class AspNetOptions
+    public partial class AspNetOptions
     {
         private readonly IServiceCollection _services;
         private readonly Registration _registration;

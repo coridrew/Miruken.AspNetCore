@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Source\Miruken.AspNetCore.SignalR.Api\Miruken.AspNetCore.SignalR.Api.csproj" />
+    <ProjectReference Include="..\..\Source\Miruken.AspNetCore\Miruken.AspNetCore.csproj" />
+    <ProjectReference Include="..\Miruken.AspNetCore.Tests\Miruken.AspNetCore.Tests.csproj" />
+  </ItemGroup>
+
+
+
+</Project>
