@@ -5,7 +5,6 @@
     using System.Threading;
     using System.Threading.Tasks;
     using Callback;
-    using Infrastructure;
     using Microsoft.AspNetCore.SignalR.Client;
     using Microsoft.Extensions.DependencyInjection;
     using Miruken.Api;
@@ -38,16 +37,13 @@
 
             var message = new HubMessage(routed.Message);
 
-            if (routed.Message.GetType().IsClassOf(typeof(IRequest<>)))
+            if (command.Many)
+                await connection.InvokeAsync(Publish, message);
+            else
             {
                 var response = await connection.InvokeAsync<HubMessage>(Process, message);
                 return response?.Payload;
             }
-
-            if (command.Many)
-                await connection.InvokeAsync(Publish, message);
-            else
-                await connection.InvokeAsync(Process, message);
 
             return null;
         }
@@ -117,25 +113,20 @@
             await ConnectWithRetryAsync(connection, url);
 
 #if NETSTANDARD2_1
-            connection.Reconnecting += async exception =>
-            {
-                var reconnecting = new HubReconnecting
+            connection.Reconnecting += exception => notify.Send(
+                new HubReconnecting
                 {
                     ConnectionInfo = GetConnectionInfo(connection, url),
                     Exception      = exception
-                };
-                await notify.Send(reconnecting);
-            };
+                });
 
-            connection.Reconnected += async connectionId =>
-            {
-                var reconnecting = new HubReconnected
+
+            connection.Reconnected += connectionId => notify.Send(
+                new HubReconnected
                 {
                     ConnectionInfo  = GetConnectionInfo(connection, url),
                     NewConnectionId = connectionId
-                };
-                await notify.Send(reconnecting);
-            };
+                });
 #endif
 
             _connections[url] = connection;
