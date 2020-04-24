@@ -6,8 +6,8 @@
 
     public static class RegistrationExtensions
     {
-        public static Registration WithAspNet(
-            this Registration registration, Action<AspNetOptions> configure = null)
+        public static Registration WithAspNet(this Registration registration,
+            Action<AspNetOptions> configure = null)
         {
             if (!registration.CanRegister(typeof(RegistrationExtensions)))
                 return registration;
