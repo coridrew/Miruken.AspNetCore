@@ -51,7 +51,7 @@
         [Handles]
         public async Task<HubConnectionInfo> Connect(HubConnect connect, IHandler composer)
         {
-            var connection = await GetConnection(connect.Url, composer);
+            var connection = await GetConnection(connect.Url, composer, connect);
             return GetConnectionInfo(connection, connect.Url);
         }
 
@@ -61,29 +61,64 @@
             return Disconnect(disconnect.Url);
         }
 
-        private async Task<HubConnection> GetConnection(Uri url, IHandler composer)
+        private async Task<HubConnection> GetConnection(
+            Uri        url,
+            IHandler   composer,
+            HubConnect connect = null)
         {
             if (url == null)
                 throw new ArgumentNullException(nameof(url));
 
             if (_connections.TryGetValue(url, out var connection) &&
                 connection.State != HubConnectionState.Disconnected)
+            {
+                if (connect != null)
+                {
+                    throw new InvalidOperationException(
+                        $"A connect to the Hub @ {url} already exists.");
+                }
                 return connection;
+            }
 
             if (_connections.TryRemove(url, out connection))
                 await connection.DisposeAsync();
 
-            connection = new HubConnectionBuilder()
-                .WithUrl(url)
+            var options   = connect?.Options;
+            var transport = connect?.HttpTransportType;
+
+            IHubConnectionBuilder connectionBuilder = new HubConnectionBuilder();
+
+            if (options != null)
+            {
+                connectionBuilder = transport != null
+                    ? connectionBuilder.WithUrl(url, transport.Value, options) 
+                    : connectionBuilder.WithUrl(url, options);
+            } 
+            else if (transport != null)
+                connectionBuilder = connectionBuilder.WithUrl(url, transport.Value);
+            else
+                connectionBuilder = connectionBuilder.WithUrl(url);
+
 #if NETSTANDARD2_1
-                .WithAutomaticReconnect()
+            connectionBuilder = connectionBuilder.WithAutomaticReconnect();
 #endif
-                .AddNewtonsoftJsonProtocol(options =>
-                    {
-                        options.PayloadSerializerSettings =
-                            Http.HttpFormatters.Route.SerializerSettings;
-                    })
-                .Build();
+               
+            connectionBuilder = connectionBuilder.AddNewtonsoftJsonProtocol(json =>
+                {
+                    json.PayloadSerializerSettings =
+                        Http.HttpFormatters.Route.SerializerSettings;
+                });
+
+            connection = connectionBuilder.Build();
+
+            if (connect?.HandshakeTimeout != null)
+                connection.HandshakeTimeout = connect.HandshakeTimeout.Value;
+
+            if (connect?.KeepAliveInterval != null)
+                connection.KeepAliveInterval = connect.KeepAliveInterval.Value;
+
+            if (connect?.ServerTimeout != null)
+                connection.ServerTimeout = connect.ServerTimeout.Value;
 
             var notify = composer.Notify();
 
