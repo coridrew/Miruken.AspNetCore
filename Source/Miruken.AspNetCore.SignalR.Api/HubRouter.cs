@@ -58,7 +58,7 @@
         [Handles]
         public Task Disconnect(HubDisconnect disconnect)
         {
-            return Disconnect(disconnect.Url);
+            return Disconnect(disconnect.Url, true);
         }
 
         private async Task<HubConnection> GetConnection(
@@ -83,16 +83,19 @@
             if (_connections.TryRemove(url, out connection))
                 await connection.DisposeAsync();
 
-            var options   = connect?.Options;
-            var transport = connect?.HttpTransportType;
+            var options = new HubOptions();
+            composer.Handle(options, true);
+
+            var httpOptions = options.HttpOptions;
+            var transport   = options.HttpTransportType;
 
             IHubConnectionBuilder connectionBuilder = new HubConnectionBuilder();
 
-            if (options != null)
+            if (httpOptions != null)
             {
                 connectionBuilder = transport != null
-                    ? connectionBuilder.WithUrl(url, transport.Value, options) 
-                    : connectionBuilder.WithUrl(url, options);
+                    ? connectionBuilder.WithUrl(url, transport.Value, httpOptions) 
+                    : connectionBuilder.WithUrl(url, httpOptions);
             } 
             else if (transport != null)
                 connectionBuilder = connectionBuilder.WithUrl(url, transport.Value);
@@ -111,14 +114,14 @@
 
             connection = connectionBuilder.Build();
 
-            if (connect?.HandshakeTimeout != null)
-                connection.HandshakeTimeout = connect.HandshakeTimeout.Value;
+            if (options.HandshakeTimeout != null)
+                connection.HandshakeTimeout = options.HandshakeTimeout.Value;
 
-            if (connect?.KeepAliveInterval != null)
-                connection.KeepAliveInterval = connect.KeepAliveInterval.Value;
+            if (options.KeepAliveInterval != null)
+                connection.KeepAliveInterval = options.KeepAliveInterval.Value;
 
-            if (connect?.ServerTimeout != null)
-                connection.ServerTimeout = connect.ServerTimeout.Value;
+            if (options.ServerTimeout != null)
+                connection.ServerTimeout = options.ServerTimeout.Value;
 
             var notify = composer.Notify();
 
@@ -139,10 +142,12 @@
 
             connection.On<HubMessage>(Process, message => composer
                 .With(GetConnectionInfo(connection, url))
+                .With(connection)
                 .Send(message.Payload));
 
             connection.On<HubMessage>(Publish, message => composer
                 .With(GetConnectionInfo(connection, url))
+                .With(connection)
                 .Publish(message.Payload));
 
             await ConnectWithRetryAsync(connection, url);
@@ -190,14 +195,29 @@
             }
         }
 
-        private Task Disconnect(Uri url)
+        private async Task Disconnect(Uri url, bool stop = false)
         {
             if (url == null)
                 throw new ArgumentNullException(nameof(url));
 
-            return _connections.TryRemove(url, out var connection)
-                 ? connection.DisposeAsync() 
-                 : Task.CompletedTask;
+
+
+            if (_connections.TryRemove(url, out var connection))
+            {
+                if (stop)
+                {
+                    try
+                    {
+                        await connection.StopAsync();
+                    }
+                    catch
+                    {
+                        // ignore
+                    }
+                }
+
+                await connection.DisposeAsync();
+            }
         }
 
         private static HubConnectionInfo GetConnectionInfo(HubConnection connection, Uri url)

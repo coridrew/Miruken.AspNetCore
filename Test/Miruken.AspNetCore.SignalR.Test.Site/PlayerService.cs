@@ -21,7 +21,12 @@
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            await _handler.ConnectHub("https://localhost:44305/hub/miruken");
+            await _handler
+                .HubHttpOptions(options =>
+                {
+
+                })
+                .ConnectHub("https://localhost:44305/hub/miruken");
 
             await Task.Delay(10000, stoppingToken);
 

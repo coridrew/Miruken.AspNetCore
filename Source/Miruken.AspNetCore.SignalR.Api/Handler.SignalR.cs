@@ -8,20 +8,10 @@
     public static class HandlerSignalRExtensions
     {
         public static Task<HubConnectionInfo> ConnectHub(
-            this IHandler handler, string url, Action<HubConnect> options = null)
-        {
-            return handler.ConnectHub(new Uri(url), options);
-        }
+            this IHandler handler, string url) => handler.Send(new HubConnect(new Uri(url)));
 
         public static Task<HubConnectionInfo> ConnectHub(
-            this IHandler handler, Uri url, Action<HubConnect> options = null)
-        {
-            if (handler == null)
-                throw new ArgumentNullException(nameof(handler));
-            var connect = new HubConnect(url);
-            options?.Invoke(connect);
-            return handler.Send(connect);
-        }
+            this IHandler handler, Uri url) => handler.Send(new HubConnect(url));
 
         public static Task DisconnectHub(this IHandler handler, string url) =>
             handler.DisconnectHub(new Uri(url));
