@@ -75,13 +75,12 @@
                 if (connect != null)
                 {
                     throw new InvalidOperationException(
-                        $"A connect to the Hub @ {url} already exists.");
+                        $"A connection to the Hub @ {url} already exists.");
                 }
                 return connection;
             }
 
-            if (_connections.TryRemove(url, out connection))
-                await connection.DisposeAsync();
+            await Disconnect(url);
 
             var options = new HubOptions();
             composer.Handle(options, true);
@@ -199,8 +198,6 @@
         {
             if (url == null)
                 throw new ArgumentNullException(nameof(url));
-
-
 
             if (_connections.TryRemove(url, out var connection))
             {
