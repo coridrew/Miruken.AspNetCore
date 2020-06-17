@@ -31,7 +31,7 @@
     public class HttpRouteControllerTests
     {
         private TestServer _server;
-        protected IHandler _handler;
+        private IHandler _handler;
 
         [TestInitialize]
         public void TestInitialize()
@@ -364,8 +364,7 @@
                 Assert.AreEqual(1, errors.Length);
             }, success => { Assert.Fail("Should have failed"); });
         }
-
-#if NETSTANDARD2_1
+        
         [TestMethod]
         public async Task Should_Handle_Unmapped_Errors()
         {
@@ -396,7 +395,6 @@
                 .Send(new RenderPlayer { PlayerId = response.Player.Id }
                     .RouteTo(_server.BaseAddress.AbsoluteUri));
         }
-#endif
 
         [TestMethod]
         public async Task Should_Handle_Missing_Type_Good_Status()
